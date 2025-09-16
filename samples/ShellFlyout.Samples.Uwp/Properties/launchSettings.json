@@ -1,0 +1,12 @@
+{
+	"profiles": {
+		"ShellFlyout (Packaged)": {
+			"commandName": "MsixPackage",
+			"nativeDebugging": true
+		},
+		"ShellFlyout (Unpackaged)": {
+			"commandName": "Project",
+			"nativeDebugging": true
+		}
+	}
+}
