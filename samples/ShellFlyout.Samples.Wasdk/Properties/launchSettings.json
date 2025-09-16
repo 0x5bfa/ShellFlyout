@@ -1,0 +1,10 @@
+{
+	"profiles": {
+		"ShellFlyout.Samples.Wasdk (Package)": {
+			"commandName": "MsixPackage"
+		},
+		"ShellFlyout.Samples.Wasdk (Unpackaged)": {
+			"commandName": "Project"
+		}
+	}
+}

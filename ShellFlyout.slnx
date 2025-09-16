@@ -1,0 +1,36 @@
+<Solution>
+
+  <Configurations>
+    <Platform Name="ARM64" />
+    <Platform Name="x64" />
+    <Platform Name="x86" />
+  </Configurations>
+
+  <Folder Name="/global/">
+    <File Path="README.md" />
+  </Folder>
+
+  <Folder Name="/samples/">
+    <Project Path="samples/ShellFlyout.Samples.Uwp/ShellFlyout.Samples.Uwp.csproj">
+      <Platform Solution="*|ARM64" Project="arm64" />
+      <Platform Solution="*|x64" Project="x64" />
+      <Platform Solution="*|x86" Project="x86" />
+      <Deploy />
+    </Project>
+    <Project Path="samples/ShellFlyout.Samples.Wasdk/ShellFlyout.Samples.Wasdk.csproj">
+      <Platform Solution="*|ARM64" Project="ARM64" />
+      <Platform Solution="*|x64" Project="x64" />
+      <Platform Solution="*|x86" Project="x86" />
+      <Deploy />
+    </Project>
+  </Folder>
+
+  <Folder Name="/src/">
+    <Project Path="src/ShellFlyout.Wasdk/ShellFlyout.Wasdk.csproj">
+      <Platform Solution="*|ARM64" Project="ARM64" />
+      <Platform Solution="*|x64" Project="x64" />
+      <Platform Solution="*|x86" Project="x86" />
+    </Project>
+  </Folder>
+
+</Solution>

@@ -1,0 +1,50 @@
+# Copyright (c) 0x5BFA. All rights reserved.
+# Licensed under the MIT license.
+
+name: ShellFlyout CI
+
+on:
+  push:
+    branches:
+      - main
+    paths-ignore:
+      - '.github/assets/**'
+      - 'docs/**'
+      - '*.md'
+  pull_request:
+    paths-ignore:
+      - '.github/assets/**'
+      - 'docs/**'
+      - '*.md'
+
+run-name: ${{ github.event_name == 'pull_request' && 'ShellFlyout PR Validation' || 'ShellFlyout CI Validation' }}
+
+env:
+  WORKING_DIR:           '${{ github.workspace }}' # 'D:\a\ShellFlyout\ShellFlyout'
+  SOLUTION_PATH:         '${{ github.workspace }}\ShellFlyout.slnx'
+  WASDK_APP_CSPROJ_PATH: '${{ github.workspace }}\samples\ShellFlyout.Samples.Wasdk\ShellFlyout.Samples.Wasdk.csproj'
+
+jobs:
+  build:
+    runs-on: windows-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        configuration: [Debug, Release]
+        platform: [x64, ARM64]
+    env:
+      CONFIGURATION: ${{ matrix.configuration }}
+      PLATFORM: ${{ matrix.platform }}
+
+    steps:
+    - name: Checkout the repository
+      uses: actions/checkout@v4
+    - name: Setup MSBuild
+      uses: microsoft/setup-msbuild@v2
+    - name: Setup NuGet
+      uses: NuGet/setup-nuget@v2
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+
+    - name: Build the sample app (WASDK)
+      run: msbuild /restore $env:WASDK_APP_CSPROJ_PATH /p:Configuration=$env:CONFIGURATION /p:Platform=$env:PLATFORM /p:AppxBundle=Never

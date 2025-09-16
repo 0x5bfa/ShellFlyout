@@ -1,0 +1,37 @@
+// Copyright (c) 0x5BFA. All rights reserved.
+// Licensed under the MIT license.
+
+CW_USEDEFAULT
+WA_INACTIVE
+WM_*
+S_OK
+
+IDesktopWindowXamlSourceNative2
+ICoreWindowInterop
+IUnknown
+
+GetModuleHandle
+RegisterClass
+CreateWindowEx
+GetMessage
+TranslateMessage
+DispatchMessage
+RoInitialize
+PostQuitMessage
+DefWindowProc
+LoadLibrary
+GetClientRect
+SetWindowPos
+SendMessage
+SetFocus
+SetLayeredWindowAttributes
+GetWindowLong
+SetWindowLong
+Shell_NotifyIcon
+RegisterWindowMessage
+SetForegroundWindow
+LoadImage
+GetDesktopWindow
+GetDpiForWindow
+SystemParametersInfo
+DestroyWindow

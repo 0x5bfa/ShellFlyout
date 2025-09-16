@@ -1,0 +1,33 @@
+# Copyright (c) 0x5BFA. All rights reserved.
+# Licensed under the MIT license.
+
+name: ShellFlyout CD
+
+on:
+  workflow_dispatch:
+
+env:
+  WORKING_DIR:         '${{ github.workspace }}' # 'D:\a\ShellFlyout\ShellFlyout'
+  SOLUTION_PATH:       '${{ github.workspace }}\ShellFlyout.slnx'
+  WASDK_CSPROJ_PATH:   '${{ github.workspace }}\ShellFlyout.Wasdk\ShellFlyout.Wasdk.csproj'
+
+jobs:
+
+  build:
+    runs-on: windows-latest
+    env:
+      CONFIGURATION: 'Release'
+      PLATFORM: 'x64'
+
+    steps:
+    - name: Checkout the repository
+      uses: actions/checkout@v4
+    - name: Setup MSBuild
+      uses: microsoft/setup-msbuild@v2
+    - name: Setup NuGet
+      uses: NuGet/setup-nuget@v2
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+
+    # - name: pack the project
+    #   run: dotnet pack $env:WASDK_CSPROJ_PATH --configuration $env:CONFIGURATION --argument:Platform=$env:PLATFORM
