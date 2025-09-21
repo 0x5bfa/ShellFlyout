@@ -1,7 +1,6 @@
 ﻿// Copyright (c) 0x5BFA. All rights reserved.
 // Licensed under the MIT license.
 
-using CommunityToolkit.WinUI;
 using Microsoft.UI.Content;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
@@ -27,8 +26,7 @@ namespace Terat
 
 		private Grid? SystemBackdropTargetGrid;
 
-		[GeneratedDependencyProperty]
-		public partial bool IsOpen { get; set; }
+		public bool IsOpen { get; private set; }
 
 		public ShellFlyout()
 		{

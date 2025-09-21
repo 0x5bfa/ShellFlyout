@@ -9,7 +9,7 @@
     - .NET 9 SDK
 2. Clone the repo
     ```console
-    git clone https://github.com/0x5bfa/JumpListViewer.git
+    git clone https://github.com/0x5bfa/ShellFlyout.git
     ```
 3. Open the solution
 4. Build the solution
