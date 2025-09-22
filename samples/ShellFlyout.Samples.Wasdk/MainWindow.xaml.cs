@@ -10,8 +10,6 @@ namespace Terat.Samples.Wasdk
 		public MainWindow()
 		{
 			InitializeComponent();
-
-			AcrylicBackdropController.Initialize(this);
 		}
 	}
 }

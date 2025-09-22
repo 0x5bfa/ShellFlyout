@@ -20,19 +20,16 @@
 						BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
 						BorderThickness="1"
 						CornerRadius="{StaticResource OverlayCornerRadius}"
-						RenderTransformOrigin="0.5,0.5">
+						RenderTransformOrigin="0.5,0.5"
+						Translation="0,0,32">
 						<Grid.RenderTransform>
 							<TranslateTransform Y="1000" />
 						</Grid.RenderTransform>
+						<Grid.Shadow>
+							<ThemeShadow />
+						</Grid.Shadow>
 
-						<Grid
-							x:Name="SystemBackdropTargetGrid"
-							CornerRadius="{StaticResource OverlayCornerRadius}"
-							Translation="0,0,32">
-							<Grid.Shadow>
-								<ThemeShadow />
-							</Grid.Shadow>
-						</Grid>
+						<Grid x:Name="SystemBackdropTargetGrid" CornerRadius="{StaticResource OverlayCornerRadius}" />
 
 						<Grid>
 							<Button
@@ -44,7 +41,7 @@
 
 						<VisualStateManager.VisualStateGroups>
 							<VisualStateGroup x:Name="PopupStates">
-								<VisualState x:Name="Hidden">
+								<VisualState x:Name="Collapsed">
 									<Storyboard x:Name="Windows11HideContentStoryboard">
 										<DoubleAnimationUsingKeyFrames
 											x:Name="Windows11HideContentAnimation"

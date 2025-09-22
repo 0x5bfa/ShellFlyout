@@ -21,15 +21,11 @@ namespace Windows.Win32
 			get => _ptr is null;
 		}
 
-		// Constructors
-
 		public ComPtr(T* ptr)
 		{
 			_ptr = ptr;
 			if (ptr is not null) ((IUnknown*)ptr)->AddRef();
 		}
-
-		// Methods
 
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public void Attach(T* other)
