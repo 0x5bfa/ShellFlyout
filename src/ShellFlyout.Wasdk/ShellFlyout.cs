@@ -28,6 +28,8 @@ namespace Terat
 
 		public bool IsOpen { get; private set; }
 
+		public ContentBackdropManager? BackdropManager { get; set; }
+
 		public ShellFlyout()
 		{
 			DefaultStyleKey = typeof(ShellFlyout);
@@ -45,11 +47,11 @@ namespace Terat
 
 		private async void ShellFlyout_Loaded(object sender, RoutedEventArgs e)
 		{
-			if (AcrylicBackdropController.IsInitialized && SystemBackdropTargetGrid is not null)
+			if (SystemBackdropTargetGrid is not null)
 			{
 				if (!_isBackdropLinkInitialized)
 				{
-					_contentExternalBackdropLink = AcrylicBackdropController.Create();
+					_contentExternalBackdropLink = BackdropManager?.CreateLink();
 					_isBackdropLinkInitialized = true;
 				}
 
@@ -100,11 +102,15 @@ namespace Terat
 
 		public async Task CloseFlyoutAsync()
 		{
-			VisualStateManager.GoToState(this, "Hidden", true);
+			VisualStateManager.GoToState(this, "Collapsed", true);
 			await Task.Delay(200);
 
-			_source?.Dispose();
-			_host?.Dispose();
+			try
+			{
+				_host?.Dispose();
+				_host = null;
+			}
+			catch { }
 
 			IsOpen = false;
 		}

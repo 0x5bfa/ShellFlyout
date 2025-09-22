@@ -71,13 +71,9 @@ namespace Terat
 
 		public void Dispose()
 		{
-			// Calls WM_DESTROY
 			PInvoke.DestroyWindow(HWnd);
-
-			GC.KeepAlive(_wndProc);
-
-			// Disposes the XAML Island source
 			DesktopWindowXamlSource?.Dispose();
+			DesktopWindowXamlSource = null;
 		}
 	}
 }
