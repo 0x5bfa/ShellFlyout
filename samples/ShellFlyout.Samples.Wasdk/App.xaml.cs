@@ -4,12 +4,14 @@
 using Microsoft.UI.Composition.SystemBackdrops;
 using Microsoft.UI.Xaml;
 using System;
+using System.Threading.Tasks;
 
 namespace Terat.Samples.Wasdk
 {
 	public partial class App : Application
 	{
 		private Window? _window;
+		private SystemTrayIcon? _systemTrayIcon;
 		private ShellFlyout? _shellFlyout;
 		private ContentBackdropManager? _backdropManager;
 
@@ -26,17 +28,17 @@ namespace Terat.Samples.Wasdk
 			_backdropManager = ContentBackdropManager.Create(new DesktopAcrylicController(), _window.Compositor, ((FrameworkElement)_window.Content).ActualTheme)
 				?? throw new ArgumentNullException();
 
-			_shellFlyout = new() { Height = 736, Width = 384, BackdropManager = _backdropManager };
-
-			var icon = new SystemTrayIcon()
+			_systemTrayIcon = new SystemTrayIcon()
 			{
 				IconPath = "Assets\\TrayIcon.Dark.ico",
 				Tooltip = "ShellFlyout",
 				Id = new Guid("28DE460A-8BD6-4539-A406-5F685584FD4D")
 			};
 
-			icon.Show();
-			icon.LeftClicked += SystemTrayIcon_LeftClicked;
+			_systemTrayIcon.Show();
+			_systemTrayIcon.LeftClicked += SystemTrayIcon_LeftClicked;
+
+			_shellFlyout = new() { Height = 736, Width = 384, BackdropManager = _backdropManager };
 		}
 
 		private async void SystemTrayIcon_LeftClicked(object? sender, EventArgs e)
@@ -47,7 +49,15 @@ namespace Terat.Samples.Wasdk
 			if (_shellFlyout.IsOpen)
 				await _shellFlyout.CloseFlyoutAsync();
 			else
-				_shellFlyout.OpenFlyout();
+				await _shellFlyout.OpenFlyoutAsync();
+		}
+
+		~App()
+		{
+			_systemTrayIcon?.LeftClicked -= SystemTrayIcon_LeftClicked;
+			_systemTrayIcon?.Destroy();
+			_shellFlyout?.Dispose();
+			_backdropManager?.Dispose();
 		}
 	}
 }

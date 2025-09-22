@@ -17,6 +17,7 @@
 					<Grid
 						x:Name="RootGrid"
 						Margin="12"
+						Background="Black"
 						BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
 						BorderThickness="1"
 						CornerRadius="{StaticResource OverlayCornerRadius}"

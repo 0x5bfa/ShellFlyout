@@ -5,114 +5,129 @@ using Microsoft.UI.Content;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Hosting;
+using ShellFlyout.Wasdk;
 using System;
+using System.Diagnostics;
 using System.Numerics;
 using System.Threading.Tasks;
 using Windows.Foundation;
-using Windows.Win32;
-using Windows.Win32.Foundation;
-using Windows.Win32.UI.WindowsAndMessaging;
 
 #pragma warning disable CS8305
 
 namespace Terat
 {
-	public partial class ShellFlyout : ContentControl, IClosableContentControl
+	public partial class ShellFlyout : ContentControl, IClosableContentControl, IDisposable
 	{
 		private XamlIslandHostWindow? _host;
-		private DesktopWindowXamlSource? _source;
-		private ContentExternalBackdropLink? _contentExternalBackdropLink;
+		private ContentExternalBackdropLink? _backdropLink;
 		private bool _isBackdropLinkInitialized;
 
 		private Grid? SystemBackdropTargetGrid;
 
 		public bool IsOpen { get; private set; }
 
+		public bool IsAnimationPlaying { get; private set; }
+
 		public ContentBackdropManager? BackdropManager { get; set; }
+
+		public event EventHandler? Inactivated;
 
 		public ShellFlyout()
 		{
 			DefaultStyleKey = typeof(ShellFlyout);
+
+			VerticalAlignment = VerticalAlignment.Bottom;
+
+			_host = new XamlIslandHostWindow();
+			_host.Initialize(this, new Rect() { X = 10, Y = 10, Width = 10, Height = 10 });
+			_host.Resize(new(0,0,0,0));
+			_host.WindowInactivated += HostWindow_Inactivated;
 		}
 
 		protected override void OnApplyTemplate()
 		{
+			Debug.WriteLine("OnApplyTemplate");
+
 			base.OnApplyTemplate();
 
 			SystemBackdropTargetGrid = GetTemplateChild("SystemBackdropTargetGrid") as Grid
 				?? throw new MissingFieldException($"Could not find {"SystemBackdropTargetGrid"} in the given {nameof(ShellFlyout)}'s style.");
 
-			SystemBackdropTargetGrid.Loaded += ShellFlyout_Loaded;
+			SystemBackdropTargetGrid.Loaded += SystemBackdropTargetGrid_Loaded;
+			SystemBackdropTargetGrid.Unloaded += SystemBackdropTargetGrid_Unloaded;
 		}
 
-		private async void ShellFlyout_Loaded(object sender, RoutedEventArgs e)
+		private void SystemBackdropTargetGrid_Loaded(object sender, RoutedEventArgs e)
 		{
+			Debug.WriteLine("SystemBackdropTargetGrid_Loaded");
+
 			if (SystemBackdropTargetGrid is not null)
 			{
 				if (!_isBackdropLinkInitialized)
 				{
-					_contentExternalBackdropLink = BackdropManager?.CreateLink();
+					_backdropLink = BackdropManager?.CreateLink();
 					_isBackdropLinkInitialized = true;
 				}
 
-				if (_contentExternalBackdropLink is not null)
+				if (_backdropLink is not null)
 				{
-					_contentExternalBackdropLink.PlacementVisual.Size = SystemBackdropTargetGrid.ActualSize;
-					_contentExternalBackdropLink.PlacementVisual.Clip = _contentExternalBackdropLink.PlacementVisual.Compositor.CreateRectangleClip(0, 0, SystemBackdropTargetGrid.ActualSize.X, SystemBackdropTargetGrid.ActualSize.Y,
+					_backdropLink.PlacementVisual.Size = SystemBackdropTargetGrid.ActualSize;
+					_backdropLink.PlacementVisual.Clip = _backdropLink.PlacementVisual.Compositor.CreateRectangleClip(0, 0, SystemBackdropTargetGrid.ActualSize.X, SystemBackdropTargetGrid.ActualSize.Y,
 						new Vector2(Convert.ToSingle(SystemBackdropTargetGrid.CornerRadius.TopLeft), Convert.ToSingle(SystemBackdropTargetGrid.CornerRadius.TopLeft)),
 						new Vector2(Convert.ToSingle(SystemBackdropTargetGrid.CornerRadius.TopRight), Convert.ToSingle(SystemBackdropTargetGrid.CornerRadius.TopRight)),
 						new Vector2(Convert.ToSingle(SystemBackdropTargetGrid.CornerRadius.BottomRight), Convert.ToSingle(SystemBackdropTargetGrid.CornerRadius.BottomRight)),
 						new Vector2(Convert.ToSingle(SystemBackdropTargetGrid.CornerRadius.BottomLeft), Convert.ToSingle(SystemBackdropTargetGrid.CornerRadius.BottomLeft)));
-					ElementCompositionPreview.SetElementChildVisual(SystemBackdropTargetGrid, _contentExternalBackdropLink.PlacementVisual);
+					ElementCompositionPreview.SetElementChildVisual(SystemBackdropTargetGrid, _backdropLink.PlacementVisual);
 				}
 			}
+		}
+
+		private void SystemBackdropTargetGrid_Unloaded(object sender, RoutedEventArgs e)
+		{
+			SystemBackdropTargetGrid?.Loaded -= SystemBackdropTargetGrid_Loaded;
+			SystemBackdropTargetGrid?.Unloaded -= SystemBackdropTargetGrid_Unloaded;
+		}
+
+		public async Task OpenFlyoutAsync()
+		{
+			Debug.WriteLine("OpenFlyout in");
+
+			var bottomRightPoint = WindowHelpers.GetBottomRightCornerPoint();
+			_host?.Resize(new(bottomRightPoint.X - Width, 0, Width, bottomRightPoint.Y));
 
 			VisualStateManager.GoToState(this, "Visible", true);
 			await Task.Delay(200);
 
 			IsOpen = true;
-		}
 
-		public unsafe void OpenFlyout()
-		{
-			RECT rect;
-			PInvoke.SystemParametersInfo(SYSTEM_PARAMETERS_INFO_ACTION.SPI_GETWORKAREA, 0, &rect, 0);
-			double desktopWidth = rect.right;
-			double desktopHeight = rect.bottom;
-
-			double flyoutWidth = (Width + Margin.Left + Margin.Right) * 1;
-			double flyoutHeight = (Height + Margin.Top + Margin.Bottom) * 1;
-
-			var x = desktopWidth - flyoutWidth;
-			var y = desktopHeight - flyoutHeight;
-
-			var position = new Rect() { X = x, Y = y, Width = flyoutWidth, Height = flyoutHeight };
-			_host = new XamlIslandHostWindow() { Position = position };
-			_host.WindowInactivated += HostWindow_Inactivated;
-			_source = _host.Initialize();
-			_source?.Content = this;
-
-			IsOpen = true;
-		}
-
-		private async void HostWindow_Inactivated(object? sender, EventArgs e)
-		{
-			await CloseFlyoutAsync();
+			Debug.WriteLine("OpenFlyout out");
 		}
 
 		public async Task CloseFlyoutAsync()
 		{
+			Debug.WriteLine("CloseFlyoutAsync in");
+
 			VisualStateManager.GoToState(this, "Collapsed", true);
 			await Task.Delay(200);
 
-			try
-			{
-				_host?.Dispose();
-				_host = null;
-			}
-			catch { }
+			_host?.Resize(new(0, 0, 0, 0));
 
 			IsOpen = false;
+
+			Debug.WriteLine("CloseFlyoutAsync out");
+		}
+
+		private async void HostWindow_Inactivated(object? sender, EventArgs e)
+		{
+			Debug.WriteLine("HostWindow_Inactivated");
+
+			//await CloseFlyoutAsync();
+		}
+
+		public void Dispose()
+		{
+			_host?.WindowInactivated -= HostWindow_Inactivated;
+			_host?.Dispose();
 		}
 	}
 }

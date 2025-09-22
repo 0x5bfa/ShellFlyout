@@ -7,6 +7,8 @@ using Microsoft.UI.Content;
 using Microsoft.UI.Xaml;
 using System;
 using System.Collections.Generic;
+using System.Runtime.InteropServices.Marshalling;
+
 
 #pragma warning disable CS8305
 
@@ -39,25 +41,28 @@ namespace Terat
 			if (_backdropController is null || _compositor is null)
 				return null;
 
-			var link = ContentExternalBackdropLink.Create(_compositor);
-			link.ExternalBackdropBorderMode = CompositionBorderMode.Soft;
-			_linkCollection.Add(link);
-			_backdropController.AddSystemBackdropTarget(link);
-			return link;
+			var backdropLink = ContentExternalBackdropLink.Create(_compositor);
+			backdropLink.ExternalBackdropBorderMode = CompositionBorderMode.Soft;
+			_linkCollection.Add(backdropLink);
+			_backdropController.AddSystemBackdropTarget(backdropLink);
+			return backdropLink;
 		}
 
-		public void RemoveLink(ContentExternalBackdropLink link)
+		public void RemoveLink(ContentExternalBackdropLink backdropLink)
 		{
-			if (!_linkCollection.Contains(link))
+			if (!_linkCollection.Contains(backdropLink))
 				return;
 
 			try
 			{
-				_backdropController?.RemoveSystemBackdropTarget(link);
-				link.Dispose();
-				_linkCollection.Remove(link);
+				_backdropController?.RemoveSystemBackdropTarget(backdropLink);
+				_linkCollection.Remove(backdropLink);
+				backdropLink.Dispose();
 			}
-			catch { }
+			catch (Exception e)
+			{
+				ExceptionAsVoidMarshaller.ConvertToUnmanaged(e);
+			}
 		}
 
 		public void UpdateTheme(ElementTheme elementTheme)

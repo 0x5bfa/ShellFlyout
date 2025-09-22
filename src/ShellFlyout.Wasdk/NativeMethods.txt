@@ -5,6 +5,7 @@ CW_USEDEFAULT
 WA_INACTIVE
 WM_*
 S_OK
+HWND_TOP
 
 IDesktopWindowXamlSourceNative2
 ICoreWindowInterop
@@ -35,3 +36,5 @@ GetDesktopWindow
 GetDpiForWindow
 SystemParametersInfo
 DestroyWindow
+UnregisterClass
+GetWindowRect
