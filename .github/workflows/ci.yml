@@ -47,4 +47,4 @@ jobs:
       uses: actions/setup-dotnet@v4
 
     - name: Build the sample app (WASDK)
-      run: dotnet build $env:WASDK_APP_CSPROJ_PATH /p:Configuration=$env:CONFIGURATION /p:Platform=$env:PLATFORM /p:AppxBundle=Never
+      run: msbuild /restore $env:WASDK_APP_CSPROJ_PATH /p:Configuration=$env:CONFIGURATION /p:Platform=$env:PLATFORM /p:AppxBundle=Never

@@ -14,7 +14,7 @@
 		<PublishAot>true</PublishAot>
 		<DisableRuntimeMarshalling>true</DisableRuntimeMarshalling>
 		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-		<LangVersion>latest</LangVersion>
+		<LangVersion>preview</LangVersion>
 		<HasPackageAndPublishMenu Condition="'$(DisableHasPackageAndPublishMenuAddedByProject)'!='true' and '$(EnableMsixTooling)'=='true'">true</HasPackageAndPublishMenu>
 	</PropertyGroup>
 
