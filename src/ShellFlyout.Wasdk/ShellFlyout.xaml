@@ -24,7 +24,7 @@
 						RenderTransformOrigin="0.5,0.5"
 						Translation="0,0,32">
 						<Grid.RenderTransform>
-							<TranslateTransform Y="1000" />
+							<TranslateTransform X="0" Y="0" />
 						</Grid.RenderTransform>
 						<Grid.Shadow>
 							<ThemeShadow />
@@ -32,20 +32,36 @@
 
 						<Grid x:Name="SystemBackdropTargetGrid" CornerRadius="{StaticResource OverlayCornerRadius}" />
 
-						<Grid>
-							<Button
-								x:Name="HelloButton"
-								HorizontalAlignment="Center"
-								VerticalAlignment="Center"
-								Content="Hello!" />
+						<Grid x:Name="MainContentGrid">
+							<ContentPresenter x:Name="MainContentPresenter" />
+							<Button Content="Button">
+								<Button.Flyout>
+									<MenuFlyout>
+										<MenuFlyoutItem Text="A" />
+									</MenuFlyout>
+								</Button.Flyout>
+							</Button>
 						</Grid>
 
 						<VisualStateManager.VisualStateGroups>
 							<VisualStateGroup x:Name="PopupStates">
-								<VisualState x:Name="Collapsed">
-									<Storyboard x:Name="Windows11HideContentStoryboard">
+								<VisualState x:Name="BottomToTop">
+									<Storyboard>
 										<DoubleAnimationUsingKeyFrames
-											x:Name="Windows11HideContentAnimation"
+											EnableDependentAnimation="True"
+											Storyboard.TargetName="RootGrid"
+											Storyboard.TargetProperty="(UIElement.RenderTransform).(TranslateTransform.Y)">
+											<DiscreteDoubleKeyFrame KeyTime="0:0:0" Value="736" />
+											<SplineDoubleKeyFrame
+												KeySpline="0.1,0.9 0.4,1.0"
+												KeyTime="0:0:0.167"
+												Value="0" />
+										</DoubleAnimationUsingKeyFrames>
+									</Storyboard>
+								</VisualState>
+								<VisualState x:Name="TopToBottom">
+									<Storyboard>
+										<DoubleAnimationUsingKeyFrames
 											EnableDependentAnimation="True"
 											Storyboard.TargetName="RootGrid"
 											Storyboard.TargetProperty="(UIElement.RenderTransform).(TranslateTransform.Y)">
@@ -57,18 +73,31 @@
 										</DoubleAnimationUsingKeyFrames>
 									</Storyboard>
 								</VisualState>
-								<VisualState x:Name="Visible">
-									<Storyboard x:Name="Windows11ShowContentStoryboard">
+								<VisualState x:Name="RightToLeft">
+									<Storyboard>
 										<DoubleAnimationUsingKeyFrames
-											x:Name="Windows11ShowContentAnimation"
 											EnableDependentAnimation="True"
 											Storyboard.TargetName="RootGrid"
-											Storyboard.TargetProperty="(UIElement.RenderTransform).(TranslateTransform.Y)">
-											<DiscreteDoubleKeyFrame KeyTime="0:0:0" Value="736" />
+											Storyboard.TargetProperty="(UIElement.RenderTransform).(TranslateTransform.X)">
+											<DiscreteDoubleKeyFrame KeyTime="0:0:0" Value="384" />
 											<SplineDoubleKeyFrame
 												KeySpline="0.1,0.9 0.4,1.0"
 												KeyTime="0:0:0.167"
 												Value="0" />
+										</DoubleAnimationUsingKeyFrames>
+									</Storyboard>
+								</VisualState>
+								<VisualState x:Name="LeftToRight">
+									<Storyboard>
+										<DoubleAnimationUsingKeyFrames
+											EnableDependentAnimation="True"
+											Storyboard.TargetName="RootGrid"
+											Storyboard.TargetProperty="(UIElement.RenderTransform).(TranslateTransform.X)">
+											<DiscreteDoubleKeyFrame KeyTime="0:0:0" Value="0" />
+											<SplineDoubleKeyFrame
+												KeySpline="0.2,0.0 0.9,0.0"
+												KeyTime="0:0:0.167"
+												Value="384" />
 										</DoubleAnimationUsingKeyFrames>
 									</Storyboard>
 								</VisualState>
@@ -81,4 +110,3 @@
 	</Style>
 
 </ResourceDictionary>
-

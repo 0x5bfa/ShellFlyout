@@ -99,7 +99,7 @@ namespace U5BFA.ShellFlyout
 				Width * _host.DesktopWindowXamlSource.SiteBridge.SiteView.RasterizationScale,
 				bottomRightPoint.Y));
 
-			VisualStateManager.GoToState(this, "Visible", true);
+			VisualStateManager.GoToState(this, "RightToLeft", true);
 			await Task.Delay(200);
 
 			IsOpen = true;
@@ -111,7 +111,7 @@ namespace U5BFA.ShellFlyout
 		{
 			Debug.WriteLine("CloseFlyoutAsync in");
 
-			VisualStateManager.GoToState(this, "Collapsed", true);
+			VisualStateManager.GoToState(this, "LeftToRight", true);
 			await Task.Delay(200);
 
 			_host?.Resize(new(0, 0, 0, 0));
