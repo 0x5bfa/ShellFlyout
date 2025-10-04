@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 
-namespace Terat
+namespace U5BFA
 {
 	public sealed partial class MainPage : Page
 	{

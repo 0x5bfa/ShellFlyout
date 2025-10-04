@@ -3,13 +3,15 @@
 
 using Microsoft.UI.Xaml;
 
-namespace Terat.Samples.Wasdk
+namespace U5BFA.Samples.Wasdk
 {
 	public sealed partial class MainWindow : Window
 	{
 		public MainWindow()
 		{
 			InitializeComponent();
+
+			AppWindow.Resize(new(800, 600));
 		}
 	}
 }

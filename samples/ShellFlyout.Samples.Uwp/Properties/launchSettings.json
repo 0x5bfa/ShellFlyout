@@ -1,10 +1,10 @@
 {
 	"profiles": {
-		"ShellFlyout (Packaged)": {
+		"ShellFlyout.Samples.Uwp (Packaged)": {
 			"commandName": "MsixPackage",
 			"nativeDebugging": true
 		},
-		"ShellFlyout (Unpackaged)": {
+		"ShellFlyout.Samples.Uwp (Unpackaged)": {
 			"commandName": "Project",
 			"nativeDebugging": true
 		}

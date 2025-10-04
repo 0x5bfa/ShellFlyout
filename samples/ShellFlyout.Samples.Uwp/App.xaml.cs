@@ -1,15 +1,13 @@
 ﻿// Copyright (c) 0x5BFA. All rights reserved.
 // Licensed under the MIT license.
 
-using System;
 using System.Threading;
-using System.Threading.Tasks;
 using Windows.System;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Media.Animation;
 
-namespace Terat
+namespace U5BFA
 {
 	public partial class App : Application
 	{

@@ -12,7 +12,7 @@ using Windows.Win32;
 using Windows.Win32.Foundation;
 using Windows.Win32.UI.WindowsAndMessaging;
 
-namespace Terat
+namespace U5BFA
 {
 	public unsafe partial class XamlIslandHostWindow : IDisposable
 	{
@@ -31,7 +31,7 @@ namespace Terat
 			_wndProc = new(WndProc);
 		}
 
-		public void Initialize(UIElement content, Rect position)
+		public void Initialize(UIElement content)
 		{
 			WNDCLASSW wndClass = default;
 			wndClass.lpfnWndProc = (delegate* unmanaged[Stdcall]<HWND, uint, WPARAM, LPARAM, LRESULT>)Marshal.GetFunctionPointerForDelegate(_wndProc);
@@ -44,8 +44,7 @@ namespace Terat
 				(PCWSTR)Unsafe.AsPointer(ref Unsafe.AsRef(in WindowClassName.GetPinnableReference())),
 				(PCWSTR)Unsafe.AsPointer(ref Unsafe.AsRef(in WindowName.GetPinnableReference())),
 				WINDOW_STYLE.WS_POPUP | WINDOW_STYLE.WS_VISIBLE | WINDOW_STYLE.WS_SYSMENU,
-				(int)position.X, (int)position.Y, (int)position.Width, (int)position.Height,
-				HWND.Null, HMENU.Null, wndClass.hInstance, null);
+				0, 0, 0, 0, HWND.Null, HMENU.Null, wndClass.hInstance, null);
 
 			DesktopWindowXamlSource = new();
 			DesktopWindowXamlSource.Initialize(Win32Interop.GetWindowIdFromWindow(HWnd));

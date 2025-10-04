@@ -9,10 +9,7 @@ using System;
 using System.Collections.Generic;
 using System.Runtime.InteropServices.Marshalling;
 
-
-#pragma warning disable CS8305
-
-namespace Terat
+namespace U5BFA
 {
 	public partial class ContentBackdropManager : IDisposable
 	{

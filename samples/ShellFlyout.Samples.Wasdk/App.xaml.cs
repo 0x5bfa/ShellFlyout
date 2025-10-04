@@ -4,9 +4,8 @@
 using Microsoft.UI.Composition.SystemBackdrops;
 using Microsoft.UI.Xaml;
 using System;
-using System.Threading.Tasks;
 
-namespace Terat.Samples.Wasdk
+namespace U5BFA.Samples.Wasdk
 {
 	public partial class App : Application
 	{

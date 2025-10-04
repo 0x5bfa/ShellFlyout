@@ -10,13 +10,12 @@ using System;
 using System.Diagnostics;
 using System.Numerics;
 using System.Threading.Tasks;
-using Windows.Foundation;
 
 #pragma warning disable CS8305
 
-namespace Terat
+namespace U5BFA
 {
-	public partial class ShellFlyout : ContentControl, IClosableContentControl, IDisposable
+	public partial class ShellFlyout : ContentControl, IDisposable
 	{
 		private XamlIslandHostWindow? _host;
 		private ContentExternalBackdropLink? _backdropLink;
@@ -39,8 +38,7 @@ namespace Terat
 			VerticalAlignment = VerticalAlignment.Bottom;
 
 			_host = new XamlIslandHostWindow();
-			_host.Initialize(this, new Rect() { X = 10, Y = 10, Width = 10, Height = 10 });
-			_host.Resize(new(0,0,0,0));
+			_host.Initialize(this);
 			_host.WindowInactivated += HostWindow_Inactivated;
 		}
 

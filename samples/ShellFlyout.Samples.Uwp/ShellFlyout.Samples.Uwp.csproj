@@ -30,4 +30,8 @@
 		<PackageReference Include="Microsoft.UI.Xaml" Version="2.8.7" />
 	</ItemGroup>
 
+	<ItemGroup>
+	  <ProjectReference Include="..\..\src\ShellFlyout.Uwp\ShellFlyout.Uwp.csproj" />
+	</ItemGroup>
+
 </Project>

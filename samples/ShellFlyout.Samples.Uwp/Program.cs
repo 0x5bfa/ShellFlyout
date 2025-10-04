@@ -2,11 +2,8 @@
 // Licensed under the MIT license.
 
 using System;
-using System.Threading;
-using Windows.System;
-using Windows.UI.Xaml;
 
-namespace Terat
+namespace U5BFA
 {
 	internal class Program
 	{
@@ -16,7 +13,8 @@ namespace Terat
 			var icon = new SystemTrayIcon()
 			{
 				IconPath = "Assets\\TrayIcon.Dark.ico",
-				Tooltip = "ShellFlyout"
+				Tooltip = "ShellFlyout",
+				Id = new Guid("28DE460A-8BD6-4539-A406-5F685584FD4D")
 			};
 
 			icon.Show();
