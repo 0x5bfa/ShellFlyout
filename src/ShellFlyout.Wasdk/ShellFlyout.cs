@@ -87,10 +87,17 @@ namespace U5BFA.ShellFlyout
 
 		public async Task OpenFlyoutAsync()
 		{
+			if (_host?.DesktopWindowXamlSource is null)
+				return;
+
 			Debug.WriteLine("OpenFlyout in");
 
 			var bottomRightPoint = WindowHelpers.GetBottomRightCornerPoint();
-			_host?.Resize(new(bottomRightPoint.X - Width, 0, Width, bottomRightPoint.Y));
+			_host?.Resize(new(
+				bottomRightPoint.X - Width * _host.DesktopWindowXamlSource.SiteBridge.SiteView.RasterizationScale,
+				0,
+				Width * _host.DesktopWindowXamlSource.SiteBridge.SiteView.RasterizationScale,
+				bottomRightPoint.Y));
 
 			VisualStateManager.GoToState(this, "Visible", true);
 			await Task.Delay(200);
@@ -123,6 +130,7 @@ namespace U5BFA.ShellFlyout
 
 		public void Dispose()
 		{
+			if (_backdropLink is not null) BackdropManager?.RemoveLink(_backdropLink);
 			_host?.WindowInactivated -= HostWindow_Inactivated;
 			_host?.Dispose();
 		}

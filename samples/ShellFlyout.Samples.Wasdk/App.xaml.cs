@@ -37,7 +37,7 @@ namespace U5BFA.ShellFlyout
 			_systemTrayIcon.Show();
 			_systemTrayIcon.LeftClicked += SystemTrayIcon_LeftClicked;
 
-			_shellFlyout = new() { Height = 736, Width = 384, BackdropManager = _backdropManager };
+			_shellFlyout = new() { BackdropManager = _backdropManager };
 		}
 
 		private async void SystemTrayIcon_LeftClicked(object? sender, EventArgs e)
