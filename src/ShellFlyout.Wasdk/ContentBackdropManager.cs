@@ -9,7 +9,7 @@ using System;
 using System.Collections.Generic;
 using System.Runtime.InteropServices.Marshalling;
 
-namespace U5BFA
+namespace U5BFA.ShellFlyout
 {
 	public partial class ContentBackdropManager : IDisposable
 	{

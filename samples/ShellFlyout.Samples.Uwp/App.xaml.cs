@@ -7,7 +7,7 @@ using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Media.Animation;
 
-namespace U5BFA
+namespace U5BFA.ShellFlyout
 {
 	public partial class App : Application
 	{

@@ -5,7 +5,6 @@ using Microsoft.UI.Content;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Hosting;
-using ShellFlyout.Wasdk;
 using System;
 using System.Diagnostics;
 using System.Numerics;
@@ -13,7 +12,7 @@ using System.Threading.Tasks;
 
 #pragma warning disable CS8305
 
-namespace U5BFA
+namespace U5BFA.ShellFlyout
 {
 	public partial class ShellFlyout : ContentControl, IDisposable
 	{

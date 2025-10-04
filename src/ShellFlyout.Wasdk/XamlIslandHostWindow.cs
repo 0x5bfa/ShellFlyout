@@ -12,7 +12,7 @@ using Windows.Win32;
 using Windows.Win32.Foundation;
 using Windows.Win32.UI.WindowsAndMessaging;
 
-namespace U5BFA
+namespace U5BFA.ShellFlyout
 {
 	public unsafe partial class XamlIslandHostWindow : IDisposable
 	{

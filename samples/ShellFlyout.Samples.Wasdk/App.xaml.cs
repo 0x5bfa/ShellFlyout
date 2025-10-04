@@ -5,7 +5,7 @@ using Microsoft.UI.Composition.SystemBackdrops;
 using Microsoft.UI.Xaml;
 using System;
 
-namespace U5BFA.Samples.Wasdk
+namespace U5BFA.ShellFlyout
 {
 	public partial class App : Application
 	{

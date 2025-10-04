@@ -14,8 +14,9 @@ using Windows.Win32.System.WinRT;
 using Windows.Win32.System.WinRT.Xaml;
 using Windows.Win32.UI.WindowsAndMessaging;
 using WinRT;
+using static Windows.Win32.ManualDefinitions;
 
-namespace U5BFA
+namespace U5BFA.ShellFlyout
 {
 	[UnmanagedFunctionPointer(CallingConvention.Winapi)]
 	public delegate LRESULT WNDPROC([In] HWND hWnd, [In] uint uMsg, [In] WPARAM wParam, [In] LPARAM lParam);

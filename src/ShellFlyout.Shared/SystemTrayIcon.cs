@@ -8,7 +8,7 @@ using Windows.Win32.Foundation;
 using Windows.Win32.UI.Shell;
 using Windows.Win32.UI.WindowsAndMessaging;
 
-namespace U5BFA
+namespace U5BFA.ShellFlyout
 {
 	public unsafe class SystemTrayIcon
 	{
@@ -100,7 +100,7 @@ namespace U5BFA
 			}
 		}
 
-		internal LRESULT WndProc(HWND hWnd, uint uMsg, WPARAM wParam, LPARAM lParam)
+		private LRESULT WndProc(HWND hWnd, uint uMsg, WPARAM wParam, LPARAM lParam)
 		{
 			switch (uMsg)
 			{

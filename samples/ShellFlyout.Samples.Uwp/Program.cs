@@ -3,7 +3,7 @@
 
 using System;
 
-namespace U5BFA
+namespace U5BFA.ShellFlyout
 {
 	internal class Program
 	{

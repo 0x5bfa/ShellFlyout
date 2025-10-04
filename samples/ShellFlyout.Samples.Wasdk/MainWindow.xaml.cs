@@ -3,7 +3,7 @@
 
 using Microsoft.UI.Xaml;
 
-namespace U5BFA.Samples.Wasdk
+namespace U5BFA.ShellFlyout
 {
 	public sealed partial class MainWindow : Window
 	{

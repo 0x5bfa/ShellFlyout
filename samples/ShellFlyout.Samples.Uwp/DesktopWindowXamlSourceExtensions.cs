@@ -4,7 +4,7 @@
 using Windows.UI.Xaml.Hosting;
 using Windows.Win32;
 
-namespace U5BFA
+namespace U5BFA.ShellFlyout
 {
 	public unsafe static class DesktopWindowXamlSourceExtensions
 	{

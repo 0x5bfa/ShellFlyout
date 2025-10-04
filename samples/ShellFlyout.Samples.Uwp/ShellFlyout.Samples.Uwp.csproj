@@ -18,12 +18,8 @@
 		<Nullable>enable</Nullable>
 
 		<DisableEmbeddedXbf>true</DisableEmbeddedXbf>
-		<DefineConstants>DISABLE_XAML_GENERATED_MAIN;$(DefineConstants)</DefineConstants>
+		<DefineConstants>$(DefineConstants);DISABLE_XAML_GENERATED_MAIN</DefineConstants>
 	</PropertyGroup>
-
-	<ItemGroup>
-		<AppxTargetDeviceFamilyItem Include="Windows.Desktop" />
-	</ItemGroup>
 
 	<ItemGroup>
 		<PackageReference Include="Microsoft.Windows.CsWin32" Version="0.3.183" PrivateAssets="all" />

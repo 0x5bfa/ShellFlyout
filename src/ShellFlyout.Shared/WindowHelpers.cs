@@ -6,7 +6,7 @@ using Windows.Win32;
 using Windows.Win32.Foundation;
 using Windows.Win32.UI.WindowsAndMessaging;
 
-namespace ShellFlyout.Wasdk
+namespace U5BFA.ShellFlyout
 {
 	internal unsafe static class WindowHelpers
 	{
