@@ -10,23 +10,23 @@ using System.Diagnostics;
 using System.Numerics;
 using System.Threading.Tasks;
 
-#pragma warning disable CS8305
-
 namespace U5BFA.ShellFlyout
 {
 	public partial class ShellFlyout : ContentControl, IDisposable
 	{
+		private const string PART_SystemBackdropTargetGrid = "SystemBackdropTargetGrid";
+		private const string PART_MainContentPresenter = "MainContentPresenter";
+
 		private XamlIslandHostWindow? _host;
 		private ContentExternalBackdropLink? _backdropLink;
 		private bool _isBackdropLinkInitialized;
 
 		private Grid? SystemBackdropTargetGrid;
+		private ContentPresenter? MainContentPresenter;
 
 		public bool IsOpen { get; private set; }
 
 		public bool IsAnimationPlaying { get; private set; }
-
-		public ContentBackdropManager? BackdropManager { get; set; }
 
 		public event EventHandler? Inactivated;
 
@@ -47,8 +47,13 @@ namespace U5BFA.ShellFlyout
 
 			base.OnApplyTemplate();
 
-			SystemBackdropTargetGrid = GetTemplateChild("SystemBackdropTargetGrid") as Grid
-				?? throw new MissingFieldException($"Could not find {"SystemBackdropTargetGrid"} in the given {nameof(ShellFlyout)}'s style.");
+			SystemBackdropTargetGrid = GetTemplateChild(PART_SystemBackdropTargetGrid) as Grid
+				?? throw new MissingFieldException($"Could not find {PART_SystemBackdropTargetGrid} in the given {nameof(ShellFlyout)}'s style.");
+			MainContentPresenter = GetTemplateChild(PART_MainContentPresenter) as ContentPresenter
+				?? throw new MissingFieldException($"Could not find {PART_MainContentPresenter} in the given {nameof(ShellFlyout)}'s style.");
+
+			RegisterPropertyChangedCallback(ContentProperty, (s, e) => ((ShellFlyout)s).OnContentChanged());
+			RegisterPropertyChangedCallback(CornerRadiusProperty, (s, e) => ((ShellFlyout)s).OnCornerRadiusChanged());
 
 			SystemBackdropTargetGrid.Loaded += SystemBackdropTargetGrid_Loaded;
 			SystemBackdropTargetGrid.Unloaded += SystemBackdropTargetGrid_Unloaded;
@@ -58,25 +63,7 @@ namespace U5BFA.ShellFlyout
 		{
 			Debug.WriteLine("SystemBackdropTargetGrid_Loaded");
 
-			if (SystemBackdropTargetGrid is not null)
-			{
-				if (!_isBackdropLinkInitialized)
-				{
-					_backdropLink = BackdropManager?.CreateLink();
-					_isBackdropLinkInitialized = true;
-				}
-
-				if (_backdropLink is not null)
-				{
-					_backdropLink.PlacementVisual.Size = SystemBackdropTargetGrid.ActualSize;
-					_backdropLink.PlacementVisual.Clip = _backdropLink.PlacementVisual.Compositor.CreateRectangleClip(0, 0, SystemBackdropTargetGrid.ActualSize.X, SystemBackdropTargetGrid.ActualSize.Y,
-						new Vector2(Convert.ToSingle(SystemBackdropTargetGrid.CornerRadius.TopLeft), Convert.ToSingle(SystemBackdropTargetGrid.CornerRadius.TopLeft)),
-						new Vector2(Convert.ToSingle(SystemBackdropTargetGrid.CornerRadius.TopRight), Convert.ToSingle(SystemBackdropTargetGrid.CornerRadius.TopRight)),
-						new Vector2(Convert.ToSingle(SystemBackdropTargetGrid.CornerRadius.BottomRight), Convert.ToSingle(SystemBackdropTargetGrid.CornerRadius.BottomRight)),
-						new Vector2(Convert.ToSingle(SystemBackdropTargetGrid.CornerRadius.BottomLeft), Convert.ToSingle(SystemBackdropTargetGrid.CornerRadius.BottomLeft)));
-					ElementCompositionPreview.SetElementChildVisual(SystemBackdropTargetGrid, _backdropLink.PlacementVisual);
-				}
-			}
+			TryToggleContentBackdropVisibility(IsBackdropEnabled);
 		}
 
 		private void SystemBackdropTargetGrid_Unloaded(object sender, RoutedEventArgs e)
@@ -119,6 +106,45 @@ namespace U5BFA.ShellFlyout
 			IsOpen = false;
 
 			Debug.WriteLine("CloseFlyoutAsync out");
+		}
+
+		private void TryToggleContentBackdropVisibility(bool visible)
+		{
+			if (SystemBackdropTargetGrid is null || (!_isBackdropLinkInitialized && !visible))
+				return;
+
+			if (_isBackdropLinkInitialized)
+			{
+				if (!visible && _backdropLink is not null)
+				{
+					BackdropManager?.RemoveLink(_backdropLink);
+					_backdropLink = null;
+				}
+
+				return;
+			}
+			else
+			{
+				_backdropLink = BackdropManager?.CreateLink();
+				_isBackdropLinkInitialized = true;
+
+				UpdateBackdropTargetVisualClip();
+			}
+		}
+
+		private void UpdateBackdropTargetVisualClip()
+		{
+			if (SystemBackdropTargetGrid is null || _backdropLink is null)
+				return;
+
+			_backdropLink.PlacementVisual.Size = SystemBackdropTargetGrid.ActualSize;
+			_backdropLink.PlacementVisual.Clip = _backdropLink.PlacementVisual.Compositor.CreateRectangleClip(0, 0, SystemBackdropTargetGrid.ActualSize.X, SystemBackdropTargetGrid.ActualSize.Y,
+				new Vector2(Convert.ToSingle(SystemBackdropTargetGrid.CornerRadius.TopLeft), Convert.ToSingle(SystemBackdropTargetGrid.CornerRadius.TopLeft)),
+				new Vector2(Convert.ToSingle(SystemBackdropTargetGrid.CornerRadius.TopRight), Convert.ToSingle(SystemBackdropTargetGrid.CornerRadius.TopRight)),
+				new Vector2(Convert.ToSingle(SystemBackdropTargetGrid.CornerRadius.BottomRight), Convert.ToSingle(SystemBackdropTargetGrid.CornerRadius.BottomRight)),
+				new Vector2(Convert.ToSingle(SystemBackdropTargetGrid.CornerRadius.BottomLeft), Convert.ToSingle(SystemBackdropTargetGrid.CornerRadius.BottomLeft)));
+
+			ElementCompositionPreview.SetElementChildVisual(SystemBackdropTargetGrid, _backdropLink.PlacementVisual);
 		}
 
 		private async void HostWindow_Inactivated(object? sender, EventArgs e)

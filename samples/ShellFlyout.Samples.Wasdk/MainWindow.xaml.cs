@@ -12,6 +12,8 @@ namespace U5BFA.ShellFlyout
 			InitializeComponent();
 
 			AppWindow.Resize(new(800, 600));
+			ExtendsContentIntoTitleBar = true;
+			Content = new RootView();
 		}
 	}
 }

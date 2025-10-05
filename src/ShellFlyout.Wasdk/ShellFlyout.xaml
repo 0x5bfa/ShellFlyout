@@ -17,7 +17,6 @@
 					<Grid
 						x:Name="RootGrid"
 						Margin="12"
-						Background="Black"
 						BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
 						BorderThickness="1"
 						CornerRadius="{StaticResource OverlayCornerRadius}"
@@ -32,16 +31,7 @@
 
 						<Grid x:Name="SystemBackdropTargetGrid" CornerRadius="{StaticResource OverlayCornerRadius}" />
 
-						<Grid x:Name="MainContentGrid">
-							<ContentPresenter x:Name="MainContentPresenter" />
-							<Button Content="Button">
-								<Button.Flyout>
-									<MenuFlyout>
-										<MenuFlyoutItem Text="A" />
-									</MenuFlyout>
-								</Button.Flyout>
-							</Button>
-						</Grid>
+						<ContentPresenter x:Name="MainContentPresenter" />
 
 						<VisualStateManager.VisualStateGroups>
 							<VisualStateGroup x:Name="PopupStates">
