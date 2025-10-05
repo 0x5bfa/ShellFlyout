@@ -49,6 +49,7 @@ namespace U5BFA.ShellFlyout
 			DesktopWindowXamlSource = new();
 			DesktopWindowXamlSource.Initialize(Win32Interop.GetWindowIdFromWindow(HWnd));
 			DesktopWindowXamlSource.Content = content;
+			Resize(new(0, 0, 0, 0));
 		}
 
 		public void Resize(Rect rect)
@@ -56,16 +57,25 @@ namespace U5BFA.ShellFlyout
 			if (DesktopWindowXamlSource is null)
 				return;
 
-			var isCollapsed = rect.Width is 0 && rect.Height is 0;
-			if (isCollapsed)
-				DesktopWindowXamlSource.SiteBridge.Hide();
-			else
-				DesktopWindowXamlSource.SiteBridge.Show();
+			DesktopWindowXamlSource.SiteBridge.Show();
 
 			PInvoke.SetWindowPos(
 				HWnd, HWND.HWND_TOP,
 				(int)rect.X, (int)rect.Y, (int)rect.Width, (int)rect.Height,
-				isCollapsed ? SET_WINDOW_POS_FLAGS.SWP_HIDEWINDOW : SET_WINDOW_POS_FLAGS.SWP_SHOWWINDOW);
+				SET_WINDOW_POS_FLAGS.SWP_SHOWWINDOW);
+		}
+
+		public void Minimize()
+		{
+			if (DesktopWindowXamlSource is null)
+				return;
+
+			DesktopWindowXamlSource.SiteBridge.Hide();
+
+			PInvoke.SetWindowPos(
+				HWnd, HWND.HWND_TOP,
+				0, 0, 0, 0,
+				SET_WINDOW_POS_FLAGS.SWP_HIDEWINDOW);
 		}
 
 		private LRESULT WndProc(HWND hWnd, uint uMsg, WPARAM wParam, LPARAM lParam)

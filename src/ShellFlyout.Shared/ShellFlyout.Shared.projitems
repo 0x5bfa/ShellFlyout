@@ -12,6 +12,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)ComPtr`1.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ManualDefinitions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)SystemTrayIcon.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)TransitionHelpers.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)WindowHelpers.cs" />
   </ItemGroup>
   <ItemGroup>

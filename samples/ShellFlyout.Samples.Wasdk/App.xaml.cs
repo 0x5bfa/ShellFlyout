@@ -3,6 +3,7 @@
 
 using Microsoft.UI.Composition.SystemBackdrops;
 using Microsoft.UI.Xaml;
+using Microsoft.UI.Xaml.Controls;
 using System;
 
 namespace U5BFA.ShellFlyout
@@ -11,7 +12,8 @@ namespace U5BFA.ShellFlyout
 	{
 		private Window? _window;
 		private SystemTrayIcon? _systemTrayIcon;
-		private ShellFlyout? _shellFlyout;
+		private ShellFlyout? _leftClickShellFlyout;
+		//private ShellFlyout? _rightClickShellFlyout;
 		private ContentBackdropManager? _backdropManager;
 
 		public App()
@@ -36,27 +38,60 @@ namespace U5BFA.ShellFlyout
 
 			_systemTrayIcon.Show();
 			_systemTrayIcon.LeftClicked += SystemTrayIcon_LeftClicked;
+			_systemTrayIcon.RightClicked += SystemTrayIcon_RightClicked;
 
-			_shellFlyout = new() { BackdropManager = _backdropManager };
-			_shellFlyout.Content = new ShellFlyoutView();
+			_leftClickShellFlyout = new()
+			{
+				BackdropManager = _backdropManager,
+				IsBackdropEnabled = true,
+				Content = new ShellFlyoutView(),
+				PopupDirection = Orientation.Vertical,
+			};
+
+			//_rightClickShellFlyout = new()
+			//{
+			//	IsBackdropEnabled = false,
+			//	IsTransitionAnimationEnabled = false,
+			//	Content = new ShellFlyoutView(),
+			//	MenuFlyout = new()
+			//	{
+			//		Items =
+			//		{
+			//			new MenuFlyoutItem() { Text = "Item 1" },
+			//			new MenuFlyoutItem() { Text = "Item 2" },
+			//			new MenuFlyoutItem() { Text = "Item 3" },
+			//		}
+			//	},
+			//};
 		}
 
 		private async void SystemTrayIcon_LeftClicked(object? sender, EventArgs e)
 		{
-			if (_shellFlyout is null)
+			if (_leftClickShellFlyout is null)
 				return;
 
-			if (_shellFlyout.IsOpen)
-				await _shellFlyout.CloseFlyoutAsync();
+			if (_leftClickShellFlyout.IsOpen)
+				await _leftClickShellFlyout.CloseFlyoutAsync();
 			else
-				await _shellFlyout.OpenFlyoutAsync();
+				await _leftClickShellFlyout.OpenFlyoutAsync();
+		}
+
+		private async void SystemTrayIcon_RightClicked(object? sender, EventArgs e)
+		{
+			//if (_rightClickShellFlyout is null)
+			//	return;
+
+			//if (_rightClickShellFlyout.IsOpen)
+			//	await _rightClickShellFlyout.CloseFlyoutAsync();
+			//else
+			//	await _rightClickShellFlyout.OpenFlyoutAsync();
 		}
 
 		~App()
 		{
 			_systemTrayIcon?.LeftClicked -= SystemTrayIcon_LeftClicked;
 			_systemTrayIcon?.Destroy();
-			_shellFlyout?.Dispose();
+			_leftClickShellFlyout?.Dispose();
 			_backdropManager?.Dispose();
 		}
 	}

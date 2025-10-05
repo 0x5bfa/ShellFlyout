@@ -9,6 +9,7 @@
 		<DefaultLanguage>en-US</DefaultLanguage>
 		<IsAotCompatible>true</IsAotCompatible>
 		<DisableRuntimeMarshalling>true</DisableRuntimeMarshalling>
+		<DefineConstants>$(DefineConstants);UWP</DefineConstants>
 	</PropertyGroup>
 
 	<ItemGroup>

@@ -5,6 +5,7 @@ using Microsoft.UI.Content;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Hosting;
+using Microsoft.UI.Xaml.Media.Animation;
 using System;
 using System.Diagnostics;
 using System.Numerics;
@@ -14,13 +15,15 @@ namespace U5BFA.ShellFlyout
 {
 	public partial class ShellFlyout : ContentControl, IDisposable
 	{
-		private const string PART_SystemBackdropTargetGrid = "SystemBackdropTargetGrid";
-		private const string PART_MainContentPresenter = "MainContentPresenter";
+		private const string PART_RootGrid = "PART_RootGrid";
+		private const string PART_SystemBackdropTargetGrid = "PART_SystemBackdropTargetGrid";
+		private const string PART_MainContentPresenter = "PART_MainContentPresenter";
 
 		private XamlIslandHostWindow? _host;
 		private ContentExternalBackdropLink? _backdropLink;
 		private bool _isBackdropLinkInitialized;
 
+		private Grid? RootGrid;
 		private Grid? SystemBackdropTargetGrid;
 		private ContentPresenter? MainContentPresenter;
 
@@ -47,6 +50,8 @@ namespace U5BFA.ShellFlyout
 
 			base.OnApplyTemplate();
 
+			RootGrid = GetTemplateChild(PART_RootGrid) as Grid
+				?? throw new MissingFieldException($"Could not find {PART_RootGrid} in the given {nameof(ShellFlyout)}'s style.");
 			SystemBackdropTargetGrid = GetTemplateChild(PART_SystemBackdropTargetGrid) as Grid
 				?? throw new MissingFieldException($"Could not find {PART_SystemBackdropTargetGrid} in the given {nameof(ShellFlyout)}'s style.");
 			MainContentPresenter = GetTemplateChild(PART_MainContentPresenter) as ContentPresenter
@@ -55,22 +60,23 @@ namespace U5BFA.ShellFlyout
 			RegisterPropertyChangedCallback(ContentProperty, (s, e) => ((ShellFlyout)s).OnContentChanged());
 			RegisterPropertyChangedCallback(CornerRadiusProperty, (s, e) => ((ShellFlyout)s).OnCornerRadiusChanged());
 
-			SystemBackdropTargetGrid.Loaded += SystemBackdropTargetGrid_Loaded;
-			SystemBackdropTargetGrid.Unloaded += SystemBackdropTargetGrid_Unloaded;
+			//SystemBackdropTargetGrid.Loaded += SystemBackdropTargetGrid_Loaded;
+			//SystemBackdropTargetGrid.Unloaded += SystemBackdropTargetGrid_Unloaded;
+
+			if (Content is not null)
+				MainContentPresenter?.Content = Content;
 		}
 
-		private void SystemBackdropTargetGrid_Loaded(object sender, RoutedEventArgs e)
-		{
-			Debug.WriteLine("SystemBackdropTargetGrid_Loaded");
+		//private void SystemBackdropTargetGrid_Loaded(object sender, RoutedEventArgs e)
+		//{
+		//	Debug.WriteLine("SystemBackdropTargetGrid_Loaded");
+		//}
 
-			TryToggleContentBackdropVisibility(IsBackdropEnabled);
-		}
-
-		private void SystemBackdropTargetGrid_Unloaded(object sender, RoutedEventArgs e)
-		{
-			SystemBackdropTargetGrid?.Loaded -= SystemBackdropTargetGrid_Loaded;
-			SystemBackdropTargetGrid?.Unloaded -= SystemBackdropTargetGrid_Unloaded;
-		}
+		//private void SystemBackdropTargetGrid_Unloaded(object sender, RoutedEventArgs e)
+		//{
+		//	SystemBackdropTargetGrid?.Loaded -= SystemBackdropTargetGrid_Loaded;
+		//	SystemBackdropTargetGrid?.Unloaded -= SystemBackdropTargetGrid_Unloaded;
+		//}
 
 		public async Task OpenFlyoutAsync()
 		{
@@ -79,15 +85,32 @@ namespace U5BFA.ShellFlyout
 
 			Debug.WriteLine("OpenFlyout in");
 
+			var width = ((FrameworkElement)Content).Width + Margin.Left + Margin.Right;
+
 			var bottomRightPoint = WindowHelpers.GetBottomRightCornerPoint();
 			_host?.Resize(new(
-				bottomRightPoint.X - Width * _host.DesktopWindowXamlSource.SiteBridge.SiteView.RasterizationScale,
+				bottomRightPoint.X - width * _host.DesktopWindowXamlSource.SiteBridge.SiteView.RasterizationScale,
 				0,
-				Width * _host.DesktopWindowXamlSource.SiteBridge.SiteView.RasterizationScale,
+				width * _host.DesktopWindowXamlSource.SiteBridge.SiteView.RasterizationScale,
 				bottomRightPoint.Y));
 
-			VisualStateManager.GoToState(this, "RightToLeft", true);
-			await Task.Delay(200);
+			UpdateLayout();
+
+			await Task.Delay(1);
+
+			if (IsBackdropEnabled)
+				EnsureContentBackdrop();
+			else
+				DiscardContentBackdrop();
+
+			if (IsTransitionAnimationEnabled && RootGrid is not null)
+			{
+				var storyboard = PopupDirection is Orientation.Vertical
+					? TransitionHelpers.GetWindows11BottomToTopTransitionStoryboard(RootGrid, 760, 0)
+					: TransitionHelpers.GetWindows11RightToLeftTransitionStoryboard(RootGrid, 384, 0);
+				storyboard.Begin();
+				await Task.Delay(200);
+			}
 
 			IsOpen = true;
 
@@ -98,43 +121,45 @@ namespace U5BFA.ShellFlyout
 		{
 			Debug.WriteLine("CloseFlyoutAsync in");
 
-			VisualStateManager.GoToState(this, "LeftToRight", true);
-			await Task.Delay(200);
+			if (IsTransitionAnimationEnabled && RootGrid is not null)
+			{
+				var storyboard = PopupDirection is Orientation.Vertical
+					? TransitionHelpers.GetWindows11TopToBottomTransitionStoryboard(RootGrid, 0, 760)
+					: TransitionHelpers.GetWindows11LeftToRightTransitionStoryboard(RootGrid, 0, 384);
+				storyboard.Begin();
+				await Task.Delay(200);
+			}
 
-			_host?.Resize(new(0, 0, 0, 0));
+			_host?.Minimize();
 
 			IsOpen = false;
 
 			Debug.WriteLine("CloseFlyoutAsync out");
 		}
 
-		private void TryToggleContentBackdropVisibility(bool visible)
+		private void EnsureContentBackdrop()
 		{
-			if (SystemBackdropTargetGrid is null || (!_isBackdropLinkInitialized && !visible))
+			if (SystemBackdropTargetGrid is null || _isBackdropLinkInitialized)
 				return;
 
-			if (_isBackdropLinkInitialized)
-			{
-				if (!visible && _backdropLink is not null)
-				{
-					BackdropManager?.RemoveLink(_backdropLink);
-					_backdropLink = null;
-				}
+			_backdropLink = BackdropManager?.CreateLink();
+			_isBackdropLinkInitialized = true;
+			UpdateBackdropTargetVisualClip();
+		}
 
+		private void DiscardContentBackdrop()
+		{
+			if (_backdropLink is null)
 				return;
-			}
-			else
-			{
-				_backdropLink = BackdropManager?.CreateLink();
-				_isBackdropLinkInitialized = true;
 
-				UpdateBackdropTargetVisualClip();
-			}
+			BackdropManager?.RemoveLink(_backdropLink);
+			_backdropLink = null;
+			_isBackdropLinkInitialized = false;
 		}
 
 		private void UpdateBackdropTargetVisualClip()
 		{
-			if (SystemBackdropTargetGrid is null || _backdropLink is null)
+			if (SystemBackdropTargetGrid is null || _backdropLink is null || SystemBackdropTargetGrid.ActualSize.X is 0 || SystemBackdropTargetGrid.ActualSize.Y is 0)
 				return;
 
 			_backdropLink.PlacementVisual.Size = SystemBackdropTargetGrid.ActualSize;

@@ -5,6 +5,8 @@
 	xmlns:animatedvisuals="using:Microsoft.UI.Xaml.Controls.AnimatedVisuals"
 	xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
 	xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+	Width="360"
+	Height="736"
 	mc:Ignorable="d">
 
 	<Grid Padding="24" RowSpacing="24">

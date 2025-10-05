@@ -21,24 +21,53 @@ namespace U5BFA.ShellFlyout
 				typeof(ShellFlyout),
 				new PropertyMetadata(true, (s, e) => ((ShellFlyout)s).OnIsBackdropEnabledChanged()));
 
-		public Orientation PopupOrientation
+		public Orientation PopupDirection
 		{
-			get => (Orientation)GetValue(PopupOrientationProperty);
-			set => SetValue(PopupOrientationProperty, value);
+			get => (Orientation)GetValue(PopupDirectionProperty);
+			set => SetValue(PopupDirectionProperty, value);
 		}
 
-		public static readonly DependencyProperty PopupOrientationProperty =
+		public static readonly DependencyProperty PopupDirectionProperty =
 			DependencyProperty.Register(
-				nameof(PopupOrientation),
+				nameof(PopupDirection),
 				typeof(Orientation),
 				typeof(ShellFlyout),
 				new PropertyMetadata(Orientation.Vertical));
+
+		public MenuFlyout? MenuFlyout
+		{
+			get => (MenuFlyout)GetValue(MenuFlyoutProperty);
+			set => SetValue(MenuFlyoutProperty, value);
+		}
+
+		public static readonly DependencyProperty MenuFlyoutProperty =
+			DependencyProperty.Register(
+				nameof(MenuFlyout),
+				typeof(MenuFlyout),
+				typeof(ShellFlyout),
+				new PropertyMetadata(null));
+
+		public bool IsTransitionAnimationEnabled
+		{
+			get => (bool)GetValue(IsTransitionAnimationEnabledProperty);
+			set => SetValue(IsTransitionAnimationEnabledProperty, value);
+		}
+
+		public static readonly DependencyProperty IsTransitionAnimationEnabledProperty =
+			DependencyProperty.Register(
+				nameof(IsTransitionAnimationEnabled),
+				typeof(bool),
+				typeof(ShellFlyout),
+				new PropertyMetadata(true));
 
 		public ContentBackdropManager? BackdropManager { get; set; }
 
 		private void OnIsBackdropEnabledChanged()
 		{
-			TryToggleContentBackdropVisibility(IsBackdropEnabled);
+			if (IsBackdropEnabled)
+				EnsureContentBackdrop();
+			else
+				DiscardContentBackdrop();
 		}
 
 		private void OnContentChanged()

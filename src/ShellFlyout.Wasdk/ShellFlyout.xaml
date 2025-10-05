@@ -4,22 +4,24 @@
 	xmlns:animatedvisuals="using:Microsoft.UI.Xaml.Controls.AnimatedVisuals"
 	xmlns:local="using:U5BFA.ShellFlyout">
 
-	<Style BasedOn="{StaticResource DefaultShellFlyoutStyle}" TargetType="local:ShellFlyout" />
+	<Style BasedOn="{StaticResource DefaultWindows11ShellFlyoutStyle}" TargetType="local:ShellFlyout" />
 
-	<Style x:Key="DefaultShellFlyoutStyle" TargetType="local:ShellFlyout">
-		<Setter Property="Width" Value="384" />
-		<Setter Property="Height" Value="736" />
+	<Style x:Key="DefaultWindows10ShellFlyoutStyle" TargetType="local:ShellFlyout">
+		<Setter Property="Margin" Value="0" />
+		<Setter Property="CornerRadius" Value="0" />
+		<Setter Property="BorderThickness" Value="0" />
+		<Setter Property="BorderBrush" Value="{ThemeResource CardStrokeColorDefaultBrush}" />
 		<Setter Property="AutomationProperties.LandmarkType" Value="Navigation" />
 		<Setter Property="IsTabStop" Value="False" />
 		<Setter Property="Template">
 			<Setter.Value>
 				<ControlTemplate TargetType="local:ShellFlyout">
 					<Grid
-						x:Name="RootGrid"
-						Margin="12"
-						BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
-						BorderThickness="1"
-						CornerRadius="{StaticResource OverlayCornerRadius}"
+						x:Name="PART_RootGrid"
+						Margin="{TemplateBinding Margin}"
+						BorderBrush="{TemplateBinding BorderBrush}"
+						BorderThickness="{TemplateBinding BorderThickness}"
+						CornerRadius="{TemplateBinding CornerRadius}"
 						RenderTransformOrigin="0.5,0.5"
 						Translation="0,0,32">
 						<Grid.RenderTransform>
@@ -29,70 +31,42 @@
 							<ThemeShadow />
 						</Grid.Shadow>
 
-						<Grid x:Name="SystemBackdropTargetGrid" CornerRadius="{StaticResource OverlayCornerRadius}" />
+						<Grid x:Name="PART_SystemBackdropTargetGrid" CornerRadius="{TemplateBinding CornerRadius}" />
 
-						<ContentPresenter x:Name="MainContentPresenter" />
+						<ContentPresenter x:Name="PART_MainContentPresenter" />
+					</Grid>
+				</ControlTemplate>
+			</Setter.Value>
+		</Setter>
+	</Style>
 
-						<VisualStateManager.VisualStateGroups>
-							<VisualStateGroup x:Name="PopupStates">
-								<VisualState x:Name="BottomToTop">
-									<Storyboard>
-										<DoubleAnimationUsingKeyFrames
-											EnableDependentAnimation="True"
-											Storyboard.TargetName="RootGrid"
-											Storyboard.TargetProperty="(UIElement.RenderTransform).(TranslateTransform.Y)">
-											<DiscreteDoubleKeyFrame KeyTime="0:0:0" Value="736" />
-											<SplineDoubleKeyFrame
-												KeySpline="0.1,0.9 0.4,1.0"
-												KeyTime="0:0:0.167"
-												Value="0" />
-										</DoubleAnimationUsingKeyFrames>
-									</Storyboard>
-								</VisualState>
-								<VisualState x:Name="TopToBottom">
-									<Storyboard>
-										<DoubleAnimationUsingKeyFrames
-											EnableDependentAnimation="True"
-											Storyboard.TargetName="RootGrid"
-											Storyboard.TargetProperty="(UIElement.RenderTransform).(TranslateTransform.Y)">
-											<DiscreteDoubleKeyFrame KeyTime="0:0:0" Value="0" />
-											<SplineDoubleKeyFrame
-												KeySpline="0.2,0.0 0.9,0.0"
-												KeyTime="0:0:0.167"
-												Value="736" />
-										</DoubleAnimationUsingKeyFrames>
-									</Storyboard>
-								</VisualState>
-								<VisualState x:Name="RightToLeft">
-									<Storyboard>
-										<DoubleAnimationUsingKeyFrames
-											EnableDependentAnimation="True"
-											Storyboard.TargetName="RootGrid"
-											Storyboard.TargetProperty="(UIElement.RenderTransform).(TranslateTransform.X)">
-											<DiscreteDoubleKeyFrame KeyTime="0:0:0" Value="384" />
-											<SplineDoubleKeyFrame
-												KeySpline="0.1,0.9 0.4,1.0"
-												KeyTime="0:0:0.167"
-												Value="0" />
-										</DoubleAnimationUsingKeyFrames>
-									</Storyboard>
-								</VisualState>
-								<VisualState x:Name="LeftToRight">
-									<Storyboard>
-										<DoubleAnimationUsingKeyFrames
-											EnableDependentAnimation="True"
-											Storyboard.TargetName="RootGrid"
-											Storyboard.TargetProperty="(UIElement.RenderTransform).(TranslateTransform.X)">
-											<DiscreteDoubleKeyFrame KeyTime="0:0:0" Value="0" />
-											<SplineDoubleKeyFrame
-												KeySpline="0.2,0.0 0.9,0.0"
-												KeyTime="0:0:0.167"
-												Value="384" />
-										</DoubleAnimationUsingKeyFrames>
-									</Storyboard>
-								</VisualState>
-							</VisualStateGroup>
-						</VisualStateManager.VisualStateGroups>
+	<Style x:Key="DefaultWindows11ShellFlyoutStyle" TargetType="local:ShellFlyout">
+		<Setter Property="Margin" Value="12" />
+		<Setter Property="CornerRadius" Value="{StaticResource OverlayCornerRadius}" />
+		<Setter Property="BorderThickness" Value="0" />
+		<Setter Property="BorderBrush" Value="{ThemeResource CardStrokeColorDefaultBrush}" />
+		<Setter Property="AutomationProperties.LandmarkType" Value="Navigation" />
+		<Setter Property="IsTabStop" Value="False" />
+		<Setter Property="Template">
+			<Setter.Value>
+				<ControlTemplate TargetType="local:ShellFlyout">
+					<Grid
+						x:Name="PART_RootGrid"
+						BorderBrush="{TemplateBinding BorderBrush}"
+						BorderThickness="{TemplateBinding BorderThickness}"
+						CornerRadius="{TemplateBinding CornerRadius}"
+						RenderTransformOrigin="0.5,0.5"
+						Translation="0,0,32">
+						<Grid.RenderTransform>
+							<TranslateTransform X="0" Y="0" />
+						</Grid.RenderTransform>
+						<Grid.Shadow>
+							<ThemeShadow />
+						</Grid.Shadow>
+
+						<Grid x:Name="PART_SystemBackdropTargetGrid" CornerRadius="{TemplateBinding CornerRadius}" />
+
+						<ContentPresenter x:Name="PART_MainContentPresenter" />
 					</Grid>
 				</ControlTemplate>
 			</Setter.Value>
