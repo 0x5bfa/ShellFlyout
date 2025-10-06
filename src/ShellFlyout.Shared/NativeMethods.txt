@@ -38,3 +38,5 @@ SystemParametersInfo
 DestroyWindow
 UnregisterClass
 GetWindowRect
+IsWindowVisible
+ShowWindow

@@ -45,7 +45,7 @@ namespace U5BFA.ShellFlyout
 				BackdropManager = _backdropManager,
 				IsBackdropEnabled = true,
 				Content = new ShellFlyoutView(),
-				PopupDirection = Orientation.Vertical,
+				PopupDirection = Orientation.Horizontal,
 			};
 
 			//_rightClickShellFlyout = new()

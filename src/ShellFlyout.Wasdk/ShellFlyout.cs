@@ -5,7 +5,6 @@ using Microsoft.UI.Content;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Hosting;
-using Microsoft.UI.Xaml.Media.Animation;
 using System;
 using System.Diagnostics;
 using System.Numerics;
@@ -60,23 +59,23 @@ namespace U5BFA.ShellFlyout
 			RegisterPropertyChangedCallback(ContentProperty, (s, e) => ((ShellFlyout)s).OnContentChanged());
 			RegisterPropertyChangedCallback(CornerRadiusProperty, (s, e) => ((ShellFlyout)s).OnCornerRadiusChanged());
 
-			//SystemBackdropTargetGrid.Loaded += SystemBackdropTargetGrid_Loaded;
-			//SystemBackdropTargetGrid.Unloaded += SystemBackdropTargetGrid_Unloaded;
+			SystemBackdropTargetGrid.Loaded += SystemBackdropTargetGrid_Loaded;
+			SystemBackdropTargetGrid.Unloaded += SystemBackdropTargetGrid_Unloaded;
 
 			if (Content is not null)
 				MainContentPresenter?.Content = Content;
 		}
 
-		//private void SystemBackdropTargetGrid_Loaded(object sender, RoutedEventArgs e)
-		//{
-		//	Debug.WriteLine("SystemBackdropTargetGrid_Loaded");
-		//}
+		private void SystemBackdropTargetGrid_Loaded(object sender, RoutedEventArgs e)
+		{
+			Debug.WriteLine("SystemBackdropTargetGrid_Loaded");
+		}
 
-		//private void SystemBackdropTargetGrid_Unloaded(object sender, RoutedEventArgs e)
-		//{
-		//	SystemBackdropTargetGrid?.Loaded -= SystemBackdropTargetGrid_Loaded;
-		//	SystemBackdropTargetGrid?.Unloaded -= SystemBackdropTargetGrid_Unloaded;
-		//}
+		private void SystemBackdropTargetGrid_Unloaded(object sender, RoutedEventArgs e)
+		{
+			SystemBackdropTargetGrid?.Loaded -= SystemBackdropTargetGrid_Loaded;
+			SystemBackdropTargetGrid?.Unloaded -= SystemBackdropTargetGrid_Unloaded;
+		}
 
 		public async Task OpenFlyoutAsync()
 		{
@@ -86,16 +85,15 @@ namespace U5BFA.ShellFlyout
 			Debug.WriteLine("OpenFlyout in");
 
 			var width = ((FrameworkElement)Content).Width + Margin.Left + Margin.Right;
-
 			var bottomRightPoint = WindowHelpers.GetBottomRightCornerPoint();
-			_host?.Resize(new(
-				bottomRightPoint.X - width * _host.DesktopWindowXamlSource.SiteBridge.SiteView.RasterizationScale,
-				0,
-				width * _host.DesktopWindowXamlSource.SiteBridge.SiteView.RasterizationScale,
-				bottomRightPoint.Y));
+			_host?.Resize(
+				new(bottomRightPoint.X - width * _host.DesktopWindowXamlSource.SiteBridge.SiteView.RasterizationScale,
+					0,
+					width * _host.DesktopWindowXamlSource.SiteBridge.SiteView.RasterizationScale,
+					bottomRightPoint.Y),
+				false);
 
 			UpdateLayout();
-
 			await Task.Delay(1);
 
 			if (IsBackdropEnabled)
@@ -103,11 +101,13 @@ namespace U5BFA.ShellFlyout
 			else
 				DiscardContentBackdrop();
 
+			_host?.UpdateWindowVisibility(true);
+
 			if (IsTransitionAnimationEnabled && RootGrid is not null)
 			{
 				var storyboard = PopupDirection is Orientation.Vertical
-					? TransitionHelpers.GetWindows11BottomToTopTransitionStoryboard(RootGrid, 760, 0)
-					: TransitionHelpers.GetWindows11RightToLeftTransitionStoryboard(RootGrid, 384, 0);
+					? TransitionHelpers.GetWindows11BottomToTopTransitionStoryboard(RootGrid, (int)ActualHeight, 0)
+					: TransitionHelpers.GetWindows11RightToLeftTransitionStoryboard(RootGrid, (int)ActualWidth, 0);
 				storyboard.Begin();
 				await Task.Delay(200);
 			}
@@ -124,8 +124,8 @@ namespace U5BFA.ShellFlyout
 			if (IsTransitionAnimationEnabled && RootGrid is not null)
 			{
 				var storyboard = PopupDirection is Orientation.Vertical
-					? TransitionHelpers.GetWindows11TopToBottomTransitionStoryboard(RootGrid, 0, 760)
-					: TransitionHelpers.GetWindows11LeftToRightTransitionStoryboard(RootGrid, 0, 384);
+					? TransitionHelpers.GetWindows11TopToBottomTransitionStoryboard(RootGrid, 0, (int)ActualHeight)
+					: TransitionHelpers.GetWindows11LeftToRightTransitionStoryboard(RootGrid, 0, (int)ActualWidth);
 				storyboard.Begin();
 				await Task.Delay(200);
 			}

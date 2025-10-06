@@ -49,20 +49,20 @@ namespace U5BFA.ShellFlyout
 			DesktopWindowXamlSource = new();
 			DesktopWindowXamlSource.Initialize(Win32Interop.GetWindowIdFromWindow(HWnd));
 			DesktopWindowXamlSource.Content = content;
-			Resize(new(0, 0, 0, 0));
 		}
 
-		public void Resize(Rect rect)
+		public void Resize(Rect rect, bool isVisible)
 		{
 			if (DesktopWindowXamlSource is null)
 				return;
 
 			DesktopWindowXamlSource.SiteBridge.Show();
 
+			var wasVisible = PInvoke.IsWindowVisible(HWnd);
 			PInvoke.SetWindowPos(
 				HWnd, HWND.HWND_TOP,
 				(int)rect.X, (int)rect.Y, (int)rect.Width, (int)rect.Height,
-				SET_WINDOW_POS_FLAGS.SWP_SHOWWINDOW);
+				(wasVisible && isVisible) || (!wasVisible && isVisible) ? SET_WINDOW_POS_FLAGS.SWP_SHOWWINDOW : SET_WINDOW_POS_FLAGS.SWP_HIDEWINDOW);
 		}
 
 		public void Minimize()
@@ -76,6 +76,11 @@ namespace U5BFA.ShellFlyout
 				HWnd, HWND.HWND_TOP,
 				0, 0, 0, 0,
 				SET_WINDOW_POS_FLAGS.SWP_HIDEWINDOW);
+		}
+
+		public void UpdateWindowVisibility(bool isVisible)
+		{
+			PInvoke.ShowWindow(HWnd, isVisible ? SHOW_WINDOW_CMD.SW_SHOW : SHOW_WINDOW_CMD.SW_HIDE);
 		}
 
 		private LRESULT WndProc(HWND hWnd, uint uMsg, WPARAM wParam, LPARAM lParam)
