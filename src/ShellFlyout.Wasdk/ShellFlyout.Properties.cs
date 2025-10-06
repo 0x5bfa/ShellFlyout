@@ -72,12 +72,19 @@ namespace U5BFA.ShellFlyout
 
 		private void OnContentChanged()
 		{
+			if (Content is not FrameworkElement newContentAsFrameworkElement)
+				return;
+
+			if (MainContentPresenter?.Content is FrameworkElement oldContentAsFrameworkElement)
+				oldContentAsFrameworkElement.SizeChanged -= Content_SizeChanged;
+
+			newContentAsFrameworkElement.SizeChanged += Content_SizeChanged;
 			MainContentPresenter?.Content = Content;
 		}
 
 		private void OnCornerRadiusChanged()
 		{
-			UpdateBackdropTargetVisualClip();
+			UpdateBackdropVisual();
 		}
 	}
 }

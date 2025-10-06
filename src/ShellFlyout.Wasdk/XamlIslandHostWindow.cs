@@ -60,8 +60,7 @@ namespace U5BFA.ShellFlyout
 
 			var wasVisible = PInvoke.IsWindowVisible(HWnd);
 			PInvoke.SetWindowPos(
-				HWnd, HWND.HWND_TOP,
-				(int)rect.X, (int)rect.Y, (int)rect.Width, (int)rect.Height,
+				HWnd, HWND.HWND_TOP, (int)rect.X, (int)rect.Y, (int)rect.Width, (int)rect.Height,
 				(wasVisible && isVisible) || (!wasVisible && isVisible) ? SET_WINDOW_POS_FLAGS.SWP_SHOWWINDOW : SET_WINDOW_POS_FLAGS.SWP_HIDEWINDOW);
 		}
 
@@ -72,10 +71,7 @@ namespace U5BFA.ShellFlyout
 
 			DesktopWindowXamlSource.SiteBridge.Hide();
 
-			PInvoke.SetWindowPos(
-				HWnd, HWND.HWND_TOP,
-				0, 0, 0, 0,
-				SET_WINDOW_POS_FLAGS.SWP_HIDEWINDOW);
+			PInvoke.SetWindowPos(HWnd, HWND.HWND_TOP, 0, 0, 0, 0, SET_WINDOW_POS_FLAGS.SWP_HIDEWINDOW);
 		}
 
 		public void UpdateWindowVisibility(bool isVisible)

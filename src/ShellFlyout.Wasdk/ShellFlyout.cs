@@ -9,6 +9,8 @@ using System;
 using System.Diagnostics;
 using System.Numerics;
 using System.Threading.Tasks;
+using Windows.Foundation;
+using Windows.Win32;
 
 namespace U5BFA.ShellFlyout
 {
@@ -21,6 +23,8 @@ namespace U5BFA.ShellFlyout
 		private XamlIslandHostWindow? _host;
 		private ContentExternalBackdropLink? _backdropLink;
 		private bool _isBackdropLinkInitialized;
+		private long _propertyChangedCallbackTokenForContentProperty;
+		private long _propertyChangedCallbackTokenForCornerRadiusProperty;
 
 		private Grid? RootGrid;
 		private Grid? SystemBackdropTargetGrid;
@@ -29,6 +33,8 @@ namespace U5BFA.ShellFlyout
 		public bool IsOpen { get; private set; }
 
 		public bool IsAnimationPlaying { get; private set; }
+
+		public double SiteViewRasterizationScale => _host?.DesktopWindowXamlSource?.SiteBridge.SiteView.RasterizationScale ?? RasterizationScale;
 
 		public event EventHandler? Inactivated;
 
@@ -56,25 +62,20 @@ namespace U5BFA.ShellFlyout
 			MainContentPresenter = GetTemplateChild(PART_MainContentPresenter) as ContentPresenter
 				?? throw new MissingFieldException($"Could not find {PART_MainContentPresenter} in the given {nameof(ShellFlyout)}'s style.");
 
-			RegisterPropertyChangedCallback(ContentProperty, (s, e) => ((ShellFlyout)s).OnContentChanged());
-			RegisterPropertyChangedCallback(CornerRadiusProperty, (s, e) => ((ShellFlyout)s).OnCornerRadiusChanged());
+			_propertyChangedCallbackTokenForContentProperty = RegisterPropertyChangedCallback(ContentProperty, (s, e) => ((ShellFlyout)s).OnContentChanged());
+			_propertyChangedCallbackTokenForCornerRadiusProperty = RegisterPropertyChangedCallback(CornerRadiusProperty, (s, e) => ((ShellFlyout)s).OnCornerRadiusChanged());
 
-			SystemBackdropTargetGrid.Loaded += SystemBackdropTargetGrid_Loaded;
-			SystemBackdropTargetGrid.Unloaded += SystemBackdropTargetGrid_Unloaded;
+			Unloaded += ShellFlyout_Unloaded;
 
-			if (Content is not null)
-				MainContentPresenter?.Content = Content;
+			OnContentChanged();
 		}
 
-		private void SystemBackdropTargetGrid_Loaded(object sender, RoutedEventArgs e)
+		private void ShellFlyout_Unloaded(object sender, RoutedEventArgs e)
 		{
-			Debug.WriteLine("SystemBackdropTargetGrid_Loaded");
-		}
+			Unloaded -= ShellFlyout_Unloaded;
 
-		private void SystemBackdropTargetGrid_Unloaded(object sender, RoutedEventArgs e)
-		{
-			SystemBackdropTargetGrid?.Loaded -= SystemBackdropTargetGrid_Loaded;
-			SystemBackdropTargetGrid?.Unloaded -= SystemBackdropTargetGrid_Unloaded;
+			UnregisterPropertyChangedCallback(ContentProperty, _propertyChangedCallbackTokenForContentProperty);
+			UnregisterPropertyChangedCallback(CornerRadiusProperty, _propertyChangedCallbackTokenForCornerRadiusProperty);
 		}
 
 		public async Task OpenFlyoutAsync()
@@ -84,14 +85,7 @@ namespace U5BFA.ShellFlyout
 
 			Debug.WriteLine("OpenFlyout in");
 
-			var width = ((FrameworkElement)Content).Width + Margin.Left + Margin.Right;
-			var bottomRightPoint = WindowHelpers.GetBottomRightCornerPoint();
-			_host?.Resize(
-				new(bottomRightPoint.X - width * _host.DesktopWindowXamlSource.SiteBridge.SiteView.RasterizationScale,
-					0,
-					width * _host.DesktopWindowXamlSource.SiteBridge.SiteView.RasterizationScale,
-					bottomRightPoint.Y),
-				false);
+			ResizeAndPositionWindowToFitFlyout(false);
 
 			UpdateLayout();
 			await Task.Delay(1);
@@ -144,7 +138,7 @@ namespace U5BFA.ShellFlyout
 
 			_backdropLink = BackdropManager?.CreateLink();
 			_isBackdropLinkInitialized = true;
-			UpdateBackdropTargetVisualClip();
+			UpdateBackdropVisual();
 		}
 
 		private void DiscardContentBackdrop()
@@ -157,19 +151,46 @@ namespace U5BFA.ShellFlyout
 			_isBackdropLinkInitialized = false;
 		}
 
-		private void UpdateBackdropTargetVisualClip()
+		private void UpdateBackdropVisual()
 		{
-			if (SystemBackdropTargetGrid is null || _backdropLink is null || SystemBackdropTargetGrid.ActualSize.X is 0 || SystemBackdropTargetGrid.ActualSize.Y is 0)
+			if (SystemBackdropTargetGrid is null || _backdropLink is null)
 				return;
 
-			_backdropLink.PlacementVisual.Size = SystemBackdropTargetGrid.ActualSize;
-			_backdropLink.PlacementVisual.Clip = _backdropLink.PlacementVisual.Compositor.CreateRectangleClip(0, 0, SystemBackdropTargetGrid.ActualSize.X, SystemBackdropTargetGrid.ActualSize.Y,
-				new Vector2(Convert.ToSingle(SystemBackdropTargetGrid.CornerRadius.TopLeft), Convert.ToSingle(SystemBackdropTargetGrid.CornerRadius.TopLeft)),
-				new Vector2(Convert.ToSingle(SystemBackdropTargetGrid.CornerRadius.TopRight), Convert.ToSingle(SystemBackdropTargetGrid.CornerRadius.TopRight)),
-				new Vector2(Convert.ToSingle(SystemBackdropTargetGrid.CornerRadius.BottomRight), Convert.ToSingle(SystemBackdropTargetGrid.CornerRadius.BottomRight)),
-				new Vector2(Convert.ToSingle(SystemBackdropTargetGrid.CornerRadius.BottomLeft), Convert.ToSingle(SystemBackdropTargetGrid.CornerRadius.BottomLeft)));
+			var requestedWidth = (float)((FrameworkElement)Content).Width;
+			var requestedHeight = (float)((FrameworkElement)Content).Height;
+
+			_backdropLink.PlacementVisual.Size = new() { X = requestedWidth, Y = requestedHeight };
+			_backdropLink.PlacementVisual.Clip = _backdropLink.PlacementVisual.Compositor.CreateRectangleClip(0, 0, requestedWidth, requestedHeight,
+				new(Convert.ToSingle(SystemBackdropTargetGrid.CornerRadius.TopLeft), Convert.ToSingle(SystemBackdropTargetGrid.CornerRadius.TopLeft)),
+				new(Convert.ToSingle(SystemBackdropTargetGrid.CornerRadius.TopRight), Convert.ToSingle(SystemBackdropTargetGrid.CornerRadius.TopRight)),
+				new(Convert.ToSingle(SystemBackdropTargetGrid.CornerRadius.BottomRight), Convert.ToSingle(SystemBackdropTargetGrid.CornerRadius.BottomRight)),
+				new(Convert.ToSingle(SystemBackdropTargetGrid.CornerRadius.BottomLeft), Convert.ToSingle(SystemBackdropTargetGrid.CornerRadius.BottomLeft)));
 
 			ElementCompositionPreview.SetElementChildVisual(SystemBackdropTargetGrid, _backdropLink.PlacementVisual);
+		}
+
+		private void Content_SizeChanged(object sender, SizeChangedEventArgs e)
+		{
+			ResizeAndPositionWindowToFitFlyout(true);
+			UpdateBackdropVisual();
+		}
+
+		private void ResizeAndPositionWindowToFitFlyout(bool showImmediately)
+		{
+			var windowSize = new Rect()
+			{
+				Width = (((FrameworkElement)Content).Width + Margin.Left + Margin.Right) * SiteViewRasterizationScale,
+				Height = (((FrameworkElement)Content).Height + Margin.Top + Margin.Bottom) * SiteViewRasterizationScale,
+			};
+
+			var bottomRightPoint = WindowHelpers.GetBottomRightCornerPoint();
+
+			_host?.Resize(
+				new(bottomRightPoint.X - windowSize.Width,
+					bottomRightPoint.Y - windowSize.Height,
+					windowSize.Width,
+					windowSize.Height),
+				showImmediately);
 		}
 
 		private async void HostWindow_Inactivated(object? sender, EventArgs e)

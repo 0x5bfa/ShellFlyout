@@ -8,5 +8,17 @@ namespace U5BFA.ShellFlyout
 		{
 			InitializeComponent();
 		}
+
+		private void IncreaseSizeButton_Click(object sender, Microsoft.UI.Xaml.RoutedEventArgs e)
+		{
+			Height += 20;
+			Width += 20;
+        }
+
+		private void DecreaseSizeButton_Click(object sender, Microsoft.UI.Xaml.RoutedEventArgs e)
+		{
+			Height -= 20;
+			Width -= 20;
+		}
 	}
 }

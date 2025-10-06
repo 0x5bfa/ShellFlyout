@@ -9,142 +9,15 @@
 	Height="736"
 	mc:Ignorable="d">
 
-	<Grid Padding="24" RowSpacing="24">
-		<Grid.RowDefinitions>
-			<RowDefinition Height="Auto" />
-			<RowDefinition Height="Auto" />
-			<RowDefinition Height="*" />
-			<RowDefinition Height="Auto" />
-		</Grid.RowDefinitions>
-		<Grid.ColumnDefinitions>
-			<ColumnDefinition Width="*" />
-			<ColumnDefinition Width="Auto" />
-		</Grid.ColumnDefinitions>
-		<TextBlock Style="{StaticResource SubtitleTextBlockStyle}" Text="OneDrive - Personal" />
+	<StackPanel Padding="24" Spacing="24">
 		<Button
-			Grid.Column="1"
-			Width="24"
-			Height="24"
-			Padding="0"
-			Background="Transparent"
-			BorderThickness="0">
-			<AnimatedIcon x:Name="AnimatedIcon">
-				<AnimatedIcon.Source>
-					<animatedvisuals:AnimatedSettingsVisualSource />
-				</AnimatedIcon.Source>
-				<AnimatedIcon.FallbackIconSource>
-					<FontIconSource Glyph="&#xE713;" />
-				</AnimatedIcon.FallbackIconSource>
-			</AnimatedIcon>
-		</Button>
-
-		<InfoBar
-			Title="You're over your storage limit (340%)"
-			Grid.Row="1"
-			Grid.Column="0"
-			Grid.ColumnSpan="2"
-			Margin="-16,0"
-			IsOpen="True"
-			Message="You can't upload new files or send and recieve email for this account."
-			Severity="Error">
-			<InfoBar.ActionButton>
-				<Button Content="Upgrade" />
-			</InfoBar.ActionButton>
-		</InfoBar>
-
-		<StackPanel
-			Grid.Row="2"
-			Grid.Column="0"
-			Grid.ColumnSpan="2"
-			Spacing="12">
-			<Grid HorizontalAlignment="Left" ColumnSpacing="16">
-				<Grid.RowDefinitions>
-					<RowDefinition Height="Auto" />
-					<RowDefinition Height="Auto" />
-					<RowDefinition Height="Auto" />
-				</Grid.RowDefinitions>
-				<Grid.ColumnDefinitions>
-					<ColumnDefinition Width="Auto" />
-					<ColumnDefinition Width="*" />
-				</Grid.ColumnDefinitions>
-				<FontIcon
-					Grid.RowSpan="3"
-					FontSize="40"
-					Glyph="&#xE8B7;" />
-				<TextBlock Grid.Column="1" Text="File name goes here" />
-				<TextBlock
-					Grid.Row="1"
-					Grid.Column="1"
-					Foreground="{ThemeResource TextFillColorSecondaryBrush}"
-					Text="Uploaded to OneDrive" />
-				<TextBlock
-					Grid.Row="2"
-					Grid.Column="1"
-					Foreground="{ThemeResource TextFillColorSecondaryBrush}"
-					Style="{StaticResource CaptionTextBlockStyle}"
-					Text="2025/09/23" />
-			</Grid>
-			<Grid HorizontalAlignment="Left" ColumnSpacing="16">
-				<Grid.RowDefinitions>
-					<RowDefinition Height="Auto" />
-					<RowDefinition Height="Auto" />
-					<RowDefinition Height="Auto" />
-				</Grid.RowDefinitions>
-				<Grid.ColumnDefinitions>
-					<ColumnDefinition Width="Auto" />
-					<ColumnDefinition Width="*" />
-				</Grid.ColumnDefinitions>
-				<FontIcon
-					Grid.RowSpan="3"
-					FontSize="40"
-					Glyph="&#xE8B7;" />
-				<TextBlock Grid.Column="1" Text="File name goes here" />
-				<TextBlock
-					Grid.Row="1"
-					Grid.Column="1"
-					Foreground="{ThemeResource TextFillColorSecondaryBrush}"
-					Text="Uploaded to OneDrive" />
-				<TextBlock
-					Grid.Row="2"
-					Grid.Column="1"
-					Foreground="{ThemeResource TextFillColorSecondaryBrush}"
-					Style="{StaticResource CaptionTextBlockStyle}"
-					Text="2025/09/23" />
-			</Grid>
-		</StackPanel>
-
-		<Grid
-			Grid.Row="3"
-			Grid.Column="0"
-			Grid.ColumnSpan="2"
-			Margin="-16,0">
-			<Grid.ColumnDefinitions>
-				<ColumnDefinition Width="*" />
-				<ColumnDefinition Width="*" />
-				<ColumnDefinition Width="*" />
-				<ColumnDefinition Width="*" />
-			</Grid.ColumnDefinitions>
-			<AppBarButton
-				Grid.Column="0"
-				HorizontalAlignment="Center"
-				Icon="Folder"
-				Label="Open folder" />
-			<AppBarButton
-				Grid.Column="1"
-				HorizontalAlignment="Center"
-				Icon="Globe"
-				Label="View online" />
-			<AppBarButton
-				Grid.Column="2"
-				HorizontalAlignment="Center"
-				Icon="Delete"
-				Label="Recycle bin" />
-			<AppBarButton
-				Grid.Column="3"
-				HorizontalAlignment="Center"
-				Icon="Home"
-				Label="Upgrade" />
-		</Grid>
-	</Grid>
+			x:Name="IncreaseSizeButton"
+			Click="IncreaseSizeButton_Click"
+			Content="Increase size by 20px" />
+		<Button
+			x:Name="DecreaseSizeButton"
+			Click="DecreaseSizeButton_Click"
+			Content="Decrease size by 20px" />
+	</StackPanel>
 
 </UserControl>
