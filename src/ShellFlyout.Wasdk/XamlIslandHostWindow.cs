@@ -10,6 +10,7 @@ using System.Runtime.InteropServices;
 using Windows.Foundation;
 using Windows.Win32;
 using Windows.Win32.Foundation;
+using Windows.Win32.Graphics.Gdi;
 using Windows.Win32.UI.WindowsAndMessaging;
 
 namespace U5BFA.ShellFlyout
@@ -40,18 +41,20 @@ namespace U5BFA.ShellFlyout
 			PInvoke.RegisterClass(&wndClass);
 
 			HWnd = PInvoke.CreateWindowEx(
-				WINDOW_EX_STYLE.WS_EX_NOREDIRECTIONBITMAP | WINDOW_EX_STYLE.WS_EX_TOOLWINDOW,
+				WINDOW_EX_STYLE.WS_EX_TOOLWINDOW | WINDOW_EX_STYLE.WS_EX_LAYERED,
 				(PCWSTR)Unsafe.AsPointer(ref Unsafe.AsRef(in WindowClassName.GetPinnableReference())),
 				(PCWSTR)Unsafe.AsPointer(ref Unsafe.AsRef(in WindowName.GetPinnableReference())),
 				WINDOW_STYLE.WS_POPUP | WINDOW_STYLE.WS_VISIBLE | WINDOW_STYLE.WS_SYSMENU,
 				0, 0, 0, 0, HWND.Null, HMENU.Null, wndClass.hInstance, null);
+
+			PInvoke.SetLayeredWindowAttributes(HWnd, (COLORREF)0, 255, LAYERED_WINDOW_ATTRIBUTES_FLAGS.LWA_ALPHA);
 
 			DesktopWindowXamlSource = new();
 			DesktopWindowXamlSource.Initialize(Win32Interop.GetWindowIdFromWindow(HWnd));
 			DesktopWindowXamlSource.Content = content;
 		}
 
-		public void Resize(Rect rect, bool isVisible)
+		public void Resize(Rect rect, bool coerceShow)
 		{
 			if (DesktopWindowXamlSource is null)
 				return;
@@ -61,7 +64,7 @@ namespace U5BFA.ShellFlyout
 			var wasVisible = PInvoke.IsWindowVisible(HWnd);
 			PInvoke.SetWindowPos(
 				HWnd, HWND.HWND_TOP, (int)rect.X, (int)rect.Y, (int)rect.Width, (int)rect.Height,
-				(wasVisible && isVisible) || (!wasVisible && isVisible) ? SET_WINDOW_POS_FLAGS.SWP_SHOWWINDOW : SET_WINDOW_POS_FLAGS.SWP_HIDEWINDOW);
+				(coerceShow || (!coerceShow && wasVisible) ? SET_WINDOW_POS_FLAGS.SWP_SHOWWINDOW : SET_WINDOW_POS_FLAGS.SWP_HIDEWINDOW) | SET_WINDOW_POS_FLAGS.SWP_NOREDRAW);
 		}
 
 		public void Minimize()
@@ -91,12 +94,15 @@ namespace U5BFA.ShellFlyout
 					break;
 				case PInvoke.WM_SIZE:
 					{
-						if (DesktopWindowXamlSource is null)
-							break;
+						//if (DesktopWindowXamlSource is null)
+						//	break;
 
-						int x = LOWORD(lParam);
-						int y = HIWORD(lParam);
-						DesktopWindowXamlSource.SiteBridge.MoveAndResize(new(0, 0, x, y));
+						//int x = LOWORD(lParam);
+						//int y = HIWORD(lParam);
+						//DesktopWindowXamlSource.SiteBridge.MoveAndResize(new(0, 300, x, y));
+
+						//HRGN region = PInvoke.CreateRectRgn(0, 300, x, y);
+						//PInvoke.SetWindowRgn(HWnd, region, false);
 					}
 					break;
 				default:

@@ -9,7 +9,10 @@
 	Height="736"
 	mc:Ignorable="d">
 
-	<StackPanel Padding="24" Spacing="24">
+	<StackPanel
+		Padding="24"
+		VerticalAlignment="Bottom"
+		Spacing="24">
 		<Button
 			x:Name="IncreaseSizeButton"
 			Click="IncreaseSizeButton_Click"
@@ -18,6 +21,12 @@
 			x:Name="DecreaseSizeButton"
 			Click="DecreaseSizeButton_Click"
 			Content="Decrease size by 20px" />
+		<ToggleSwitch
+			x:Name="OrientationToggleSwitch"
+			Header="Orientation:"
+			OffContent="Vertical"
+			OnContent="Horizontal"
+			Toggled="OrientationToggleSwitch_Toggled" />
 	</StackPanel>
 
 </UserControl>

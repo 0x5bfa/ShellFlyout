@@ -7,10 +7,11 @@ using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Hosting;
 using System;
 using System.Diagnostics;
-using System.Numerics;
 using System.Threading.Tasks;
 using Windows.Foundation;
+using Windows.Graphics;
 using Windows.Win32;
+using Windows.Win32.Graphics.Gdi;
 
 namespace U5BFA.ShellFlyout
 {
@@ -20,7 +21,8 @@ namespace U5BFA.ShellFlyout
 		private const string PART_SystemBackdropTargetGrid = "PART_SystemBackdropTargetGrid";
 		private const string PART_MainContentPresenter = "PART_MainContentPresenter";
 
-		private XamlIslandHostWindow? _host;
+		private readonly XamlIslandHostWindow? _host;
+
 		private ContentExternalBackdropLink? _backdropLink;
 		private bool _isBackdropLinkInitialized;
 		private long _propertyChangedCallbackTokenForContentProperty;
@@ -159,7 +161,7 @@ namespace U5BFA.ShellFlyout
 			var requestedWidth = (float)((FrameworkElement)Content).Width;
 			var requestedHeight = (float)((FrameworkElement)Content).Height;
 
-			_backdropLink.PlacementVisual.Size = new() { X = requestedWidth, Y = requestedHeight };
+			_backdropLink.PlacementVisual.Size = new(requestedWidth, requestedHeight);
 			_backdropLink.PlacementVisual.Clip = _backdropLink.PlacementVisual.Compositor.CreateRectangleClip(0, 0, requestedWidth, requestedHeight,
 				new(Convert.ToSingle(SystemBackdropTargetGrid.CornerRadius.TopLeft), Convert.ToSingle(SystemBackdropTargetGrid.CornerRadius.TopLeft)),
 				new(Convert.ToSingle(SystemBackdropTargetGrid.CornerRadius.TopRight), Convert.ToSingle(SystemBackdropTargetGrid.CornerRadius.TopRight)),
@@ -171,11 +173,10 @@ namespace U5BFA.ShellFlyout
 
 		private void Content_SizeChanged(object sender, SizeChangedEventArgs e)
 		{
-			ResizeAndPositionWindowToFitFlyout(true);
 			UpdateBackdropVisual();
 		}
 
-		private void ResizeAndPositionWindowToFitFlyout(bool showImmediately)
+		private void ResizeAndPositionWindowToFitFlyout(bool forceShow)
 		{
 			var windowSize = new Rect()
 			{
@@ -185,12 +186,17 @@ namespace U5BFA.ShellFlyout
 
 			var bottomRightPoint = WindowHelpers.GetBottomRightCornerPoint();
 
-			_host?.Resize(
-				new(bottomRightPoint.X - windowSize.Width,
-					bottomRightPoint.Y - windowSize.Height,
-					windowSize.Width,
-					windowSize.Height),
-				showImmediately);
+			_host?.Resize(new(0, 0, bottomRightPoint.X, bottomRightPoint.Y), forceShow);
+
+			if (_host?.DesktopWindowXamlSource is { } dwxs)
+			{
+				RectInt32 clientRect = new((int)(bottomRightPoint.X - windowSize.Width), (int)(bottomRightPoint.Y - windowSize.Height), (int)windowSize.Width, (int)windowSize.Height);
+
+				dwxs.SiteBridge.MoveAndResize(clientRect);
+
+				HRGN region = PInvoke.CreateRectRgn(clientRect.X, clientRect.Y, bottomRightPoint.X, bottomRightPoint.Y);
+				PInvoke.SetWindowRgn(_host.HWnd, region, false);
+			}
 		}
 
 		private async void HostWindow_Inactivated(object? sender, EventArgs e)

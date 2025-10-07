@@ -2,6 +2,7 @@
 // Licensed under the MIT license.
 
 using System;
+using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using Windows.Win32;
 using Windows.Win32.Foundation;
@@ -13,6 +14,8 @@ namespace U5BFA.ShellFlyout
 	public unsafe class SystemTrayIcon
 	{
 		private const uint WM_UNIQUE_MESSAGE = 2048U;
+
+		private readonly static string TrayIconWindowClassName = $"SystemTrayIconClass_{Guid.NewGuid():B}";
 
 		private readonly uint _taskbarRestartMessageId;
 		private readonly WNDPROC _wndProc;
@@ -29,24 +32,20 @@ namespace U5BFA.ShellFlyout
 
 		public SystemTrayIcon()
 		{
-			fixed (char* pwszTaskbarCreatedWMName = "TaskbarCreated")
-				_taskbarRestartMessageId = PInvoke.RegisterWindowMessage(pwszTaskbarCreatedWMName);
+			_taskbarRestartMessageId = PInvoke.RegisterWindowMessage((PCWSTR)Unsafe.AsPointer(ref Unsafe.AsRef(in "TaskbarCreated".GetPinnableReference())));
 
-			fixed (char* pwszClassName = $"SystemTrayIcon_{Id:B}")
-			{
-				_wndProc = new(WndProc);
+			_wndProc = new(WndProc);
 
-				WNDCLASSW wndClass = default;
-				wndClass.style = WNDCLASS_STYLES.CS_DBLCLKS;
-				wndClass.lpfnWndProc = (delegate* unmanaged[Stdcall]<HWND, uint, WPARAM, LPARAM, LRESULT>)Marshal.GetFunctionPointerForDelegate(_wndProc);
-				wndClass.hInstance = PInvoke.GetModuleHandle(null);
-				wndClass.lpszClassName = pwszClassName;
-				PInvoke.RegisterClass(&wndClass);
+			WNDCLASSW wndClass = default;
+			wndClass.style = WNDCLASS_STYLES.CS_DBLCLKS;
+			wndClass.lpfnWndProc = (delegate* unmanaged[Stdcall]<HWND, uint, WPARAM, LPARAM, LRESULT>)Marshal.GetFunctionPointerForDelegate(_wndProc);
+			wndClass.hInstance = PInvoke.GetModuleHandle(null);
+			wndClass.lpszClassName = (PCWSTR)Unsafe.AsPointer(ref Unsafe.AsRef(in TrayIconWindowClassName.GetPinnableReference()));
+			PInvoke.RegisterClass(&wndClass);
 
-				_hWnd = PInvoke.CreateWindowEx(
-					WINDOW_EX_STYLE.WS_EX_LEFT, pwszClassName, null, WINDOW_STYLE.WS_OVERLAPPED,
-					0, 0, 1, 1, HWND.Null, HMENU.Null, HINSTANCE.Null, null);
-			}
+			_hWnd = PInvoke.CreateWindowEx(
+				WINDOW_EX_STYLE.WS_EX_LEFT, (PCWSTR)Unsafe.AsPointer(ref Unsafe.AsRef(in TrayIconWindowClassName.GetPinnableReference())),
+				null, WINDOW_STYLE.WS_OVERLAPPED, 0, 0, 1, 1, HWND.Null, HMENU.Null, HINSTANCE.Null, null);
 		}
 
 		public void Show()

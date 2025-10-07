@@ -12,7 +12,7 @@ namespace U5BFA.ShellFlyout
 	{
 		private Window? _window;
 		private SystemTrayIcon? _systemTrayIcon;
-		private ShellFlyout? _leftClickShellFlyout;
+		public static ShellFlyout? LeftClickShellFlyout { get; set; }
 		//private ShellFlyout? _rightClickShellFlyout;
 		private ContentBackdropManager? _backdropManager;
 
@@ -40,12 +40,12 @@ namespace U5BFA.ShellFlyout
 			_systemTrayIcon.LeftClicked += SystemTrayIcon_LeftClicked;
 			_systemTrayIcon.RightClicked += SystemTrayIcon_RightClicked;
 
-			_leftClickShellFlyout = new()
+			LeftClickShellFlyout = new()
 			{
 				BackdropManager = _backdropManager,
 				IsBackdropEnabled = true,
 				Content = new ShellFlyoutView(),
-				PopupDirection = Orientation.Horizontal,
+				PopupDirection = Orientation.Vertical,
 			};
 
 			//_rightClickShellFlyout = new()
@@ -67,13 +67,13 @@ namespace U5BFA.ShellFlyout
 
 		private async void SystemTrayIcon_LeftClicked(object? sender, EventArgs e)
 		{
-			if (_leftClickShellFlyout is null)
+			if (LeftClickShellFlyout is null)
 				return;
 
-			if (_leftClickShellFlyout.IsOpen)
-				await _leftClickShellFlyout.CloseFlyoutAsync();
+			if (LeftClickShellFlyout.IsOpen)
+				await LeftClickShellFlyout.CloseFlyoutAsync();
 			else
-				await _leftClickShellFlyout.OpenFlyoutAsync();
+				await LeftClickShellFlyout.OpenFlyoutAsync();
 		}
 
 		private async void SystemTrayIcon_RightClicked(object? sender, EventArgs e)
@@ -91,7 +91,7 @@ namespace U5BFA.ShellFlyout
 		{
 			_systemTrayIcon?.LeftClicked -= SystemTrayIcon_LeftClicked;
 			_systemTrayIcon?.Destroy();
-			_leftClickShellFlyout?.Dispose();
+			LeftClickShellFlyout?.Dispose();
 			_backdropManager?.Dispose();
 		}
 	}

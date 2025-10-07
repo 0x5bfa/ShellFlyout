@@ -40,3 +40,7 @@ UnregisterClass
 GetWindowRect
 IsWindowVisible
 ShowWindow
+CreateRectRgn
+SetWindowRgn
+GetWindowLongPtr
+SetWindowLongPtr
