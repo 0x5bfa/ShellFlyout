@@ -7,7 +7,9 @@ using Microsoft.UI.Xaml.Hosting;
 using System;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
+using System.Runtime.InteropServices.JavaScript;
 using Windows.Foundation;
+using Windows.Graphics;
 using Windows.Win32;
 using Windows.Win32.Foundation;
 using Windows.Win32.Graphics.Gdi;
@@ -15,24 +17,48 @@ using Windows.Win32.UI.WindowsAndMessaging;
 
 namespace U5BFA.ShellFlyout
 {
-	public unsafe partial class XamlIslandHostWindow : IDisposable
+	internal unsafe partial class XamlIslandHostWindow : IDisposable
 	{
 		private const string WindowClassName = "ShellFlyoutHostClass";
 		private const string WindowName = "ShellFlyoutHostWindow";
 
 		private readonly WNDPROC _wndProc;
 
-		public HWND HWnd { get; private set; }
-		public DesktopWindowXamlSource? DesktopWindowXamlSource { get; private set; }
+		internal HWND HWnd
+		{
+			[MethodImpl(MethodImplOptions.AggressiveInlining)]
+			get;
+			[MethodImpl(MethodImplOptions.AggressiveInlining)]
+			private set;
+		}
 
-		public event EventHandler? WindowInactivated;
+		internal DesktopWindowXamlSource? DesktopWindowXamlSource
+		{
+			[MethodImpl(MethodImplOptions.AggressiveInlining)]
+			get;
+			[MethodImpl(MethodImplOptions.AggressiveInlining)]
+			private set;
+		}
 
-		public XamlIslandHostWindow()
+		internal Rect WindowSize
+		{
+			[MethodImpl(MethodImplOptions.AggressiveInlining)]
+			get
+			{
+				RECT rect;
+				PInvoke.GetWindowRect(HWnd, &rect);
+				return new(rect.X, rect.Y, rect.Width, rect.Height);
+			}
+		}
+
+		internal event EventHandler? WindowInactivated;
+
+		internal XamlIslandHostWindow()
 		{
 			_wndProc = new(WndProc);
 		}
 
-		public void Initialize(UIElement content)
+		internal void Initialize(UIElement content)
 		{
 			WNDCLASSW wndClass = default;
 			wndClass.lpfnWndProc = (delegate* unmanaged[Stdcall]<HWND, uint, WPARAM, LPARAM, LRESULT>)Marshal.GetFunctionPointerForDelegate(_wndProc);
@@ -41,7 +67,7 @@ namespace U5BFA.ShellFlyout
 			PInvoke.RegisterClass(&wndClass);
 
 			HWnd = PInvoke.CreateWindowEx(
-				WINDOW_EX_STYLE.WS_EX_TOOLWINDOW | WINDOW_EX_STYLE.WS_EX_LAYERED,
+				WINDOW_EX_STYLE.WS_EX_NOREDIRECTIONBITMAP | WINDOW_EX_STYLE.WS_EX_TOOLWINDOW | WINDOW_EX_STYLE.WS_EX_LAYERED,
 				(PCWSTR)Unsafe.AsPointer(ref Unsafe.AsRef(in WindowClassName.GetPinnableReference())),
 				(PCWSTR)Unsafe.AsPointer(ref Unsafe.AsRef(in WindowName.GetPinnableReference())),
 				WINDOW_STYLE.WS_POPUP | WINDOW_STYLE.WS_VISIBLE | WINDOW_STYLE.WS_SYSMENU,
@@ -52,34 +78,42 @@ namespace U5BFA.ShellFlyout
 			DesktopWindowXamlSource = new();
 			DesktopWindowXamlSource.Initialize(Win32Interop.GetWindowIdFromWindow(HWnd));
 			DesktopWindowXamlSource.Content = content;
+
+			nint dwIslandHWndExStlye = PInvoke.GetWindowLongPtr((HWND)DesktopWindowXamlSource.SiteBridge.WindowId.Value, WINDOW_LONG_PTR_INDEX.GWL_EXSTYLE);
+			PInvoke.SetWindowLongPtr((HWND)DesktopWindowXamlSource.SiteBridge.WindowId.Value, WINDOW_LONG_PTR_INDEX.GWL_EXSTYLE, dwIslandHWndExStlye | (nint)WINDOW_EX_STYLE.WS_EX_LAYERED);
+
+			PInvoke.SetLayeredWindowAttributes((HWND)DesktopWindowXamlSource.SiteBridge.WindowId.Value, (COLORREF)0, 255, LAYERED_WINDOW_ATTRIBUTES_FLAGS.LWA_ALPHA);
 		}
 
-		public void Resize(Rect rect, bool coerceShow)
+		internal void MaximizeHWnd()
+		{
+			var bottomRightPoint = WindowHelpers.GetBottomRightCornerPoint();
+			PInvoke.SetWindowPos(HWnd, HWND.HWND_TOP, 0, 0, bottomRightPoint.X, bottomRightPoint.Y, 0U);
+		}
+
+		internal void MaximizeXamlIslandHWnd()
 		{
 			if (DesktopWindowXamlSource is null)
 				return;
 
-			DesktopWindowXamlSource.SiteBridge.Show();
-
-			var wasVisible = PInvoke.IsWindowVisible(HWnd);
-			PInvoke.SetWindowPos(
-				HWnd, HWND.HWND_TOP, (int)rect.X, (int)rect.Y, (int)rect.Width, (int)rect.Height,
-				(coerceShow || (!coerceShow && wasVisible) ? SET_WINDOW_POS_FLAGS.SWP_SHOWWINDOW : SET_WINDOW_POS_FLAGS.SWP_HIDEWINDOW) | SET_WINDOW_POS_FLAGS.SWP_NOREDRAW);
+			var bottomRightPoint = WindowHelpers.GetBottomRightCornerPoint();
+			PInvoke.SetWindowPos((HWND)DesktopWindowXamlSource.SiteBridge.WindowId.Value, HWND.HWND_TOP, 0, 0, bottomRightPoint.X, bottomRightPoint.Y, 0U);
 		}
 
-		public void Minimize()
+		internal void SetHWndRectRegion(RectInt32 rect)
 		{
 			if (DesktopWindowXamlSource is null)
 				return;
 
-			DesktopWindowXamlSource.SiteBridge.Hide();
-
-			PInvoke.SetWindowPos(HWnd, HWND.HWND_TOP, 0, 0, 0, 0, SET_WINDOW_POS_FLAGS.SWP_HIDEWINDOW);
+			HRGN region = PInvoke.CreateRectRgn(rect.X, rect.Y, rect.Width, rect.Height);
+			PInvoke.SetWindowRgn(HWnd, region, false);
+			PInvoke.SetWindowRgn((HWND)DesktopWindowXamlSource.SiteBridge.WindowId.Value, region, false);
 		}
 
-		public void UpdateWindowVisibility(bool isVisible)
+		internal void UpdateWindowVisibility(bool isVisible)
 		{
 			PInvoke.ShowWindow(HWnd, isVisible ? SHOW_WINDOW_CMD.SW_SHOW : SHOW_WINDOW_CMD.SW_HIDE);
+			if (isVisible) DesktopWindowXamlSource?.SiteBridge.Show(); else DesktopWindowXamlSource?.SiteBridge.Hide();
 		}
 
 		private LRESULT WndProc(HWND hWnd, uint uMsg, WPARAM wParam, LPARAM lParam)
@@ -90,19 +124,6 @@ namespace U5BFA.ShellFlyout
 					{
 						if (LOWORD((nint)(nuint)wParam) == PInvoke.WA_INACTIVE)
 							WindowInactivated?.Invoke(this, EventArgs.Empty);
-					}
-					break;
-				case PInvoke.WM_SIZE:
-					{
-						//if (DesktopWindowXamlSource is null)
-						//	break;
-
-						//int x = LOWORD(lParam);
-						//int y = HIWORD(lParam);
-						//DesktopWindowXamlSource.SiteBridge.MoveAndResize(new(0, 300, x, y));
-
-						//HRGN region = PInvoke.CreateRectRgn(0, 300, x, y);
-						//PInvoke.SetWindowRgn(HWnd, region, false);
 					}
 					break;
 				default:

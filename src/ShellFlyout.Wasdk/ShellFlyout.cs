@@ -8,10 +8,6 @@ using Microsoft.UI.Xaml.Hosting;
 using System;
 using System.Diagnostics;
 using System.Threading.Tasks;
-using Windows.Foundation;
-using Windows.Graphics;
-using Windows.Win32;
-using Windows.Win32.Graphics.Gdi;
 
 namespace U5BFA.ShellFlyout
 {
@@ -48,6 +44,7 @@ namespace U5BFA.ShellFlyout
 
 			_host = new XamlIslandHostWindow();
 			_host.Initialize(this);
+			_host.UpdateWindowVisibility(false);
 			_host.WindowInactivated += HostWindow_Inactivated;
 		}
 
@@ -87,17 +84,19 @@ namespace U5BFA.ShellFlyout
 
 			Debug.WriteLine("OpenFlyout in");
 
-			ResizeAndPositionWindowToFitFlyout(false);
-
-			UpdateLayout();
-			await Task.Delay(1);
+			_host.MaximizeHWnd();
+			_host.MaximizeXamlIslandHWnd();
+			UpdateFlyoutRegion();
 
 			if (IsBackdropEnabled)
 				EnsureContentBackdrop();
 			else
 				DiscardContentBackdrop();
 
-			_host?.UpdateWindowVisibility(true);
+			UpdateLayout();
+			await Task.Delay(1);
+
+			_host.UpdateWindowVisibility(true);
 
 			if (IsTransitionAnimationEnabled && RootGrid is not null)
 			{
@@ -126,7 +125,7 @@ namespace U5BFA.ShellFlyout
 				await Task.Delay(200);
 			}
 
-			_host?.Minimize();
+			_host?.UpdateWindowVisibility(false);
 
 			IsOpen = false;
 
@@ -171,32 +170,25 @@ namespace U5BFA.ShellFlyout
 			ElementCompositionPreview.SetElementChildVisual(SystemBackdropTargetGrid, _backdropLink.PlacementVisual);
 		}
 
-		private void Content_SizeChanged(object sender, SizeChangedEventArgs e)
+		private void UpdateFlyoutRegion()
 		{
-			UpdateBackdropVisual();
+			if (_host?.DesktopWindowXamlSource is null)
+				return;
+
+			var flyoutWidth = (((FrameworkElement)Content).Width + Margin.Left + Margin.Right) * SiteViewRasterizationScale;
+			var flyoutHeight = (((FrameworkElement)Content).Height + Margin.Top + Margin.Bottom) * SiteViewRasterizationScale;
+
+			_host?.SetHWndRectRegion(new(
+				(int)(_host.WindowSize.Width - flyoutWidth),
+				(int)(_host.WindowSize.Height - flyoutHeight),
+				(int)_host.WindowSize.Width,
+				(int)_host.WindowSize.Height));
 		}
 
-		private void ResizeAndPositionWindowToFitFlyout(bool forceShow)
+		private void Content_SizeChanged(object sender, SizeChangedEventArgs e)
 		{
-			var windowSize = new Rect()
-			{
-				Width = (((FrameworkElement)Content).Width + Margin.Left + Margin.Right) * SiteViewRasterizationScale,
-				Height = (((FrameworkElement)Content).Height + Margin.Top + Margin.Bottom) * SiteViewRasterizationScale,
-			};
-
-			var bottomRightPoint = WindowHelpers.GetBottomRightCornerPoint();
-
-			_host?.Resize(new(0, 0, bottomRightPoint.X, bottomRightPoint.Y), forceShow);
-
-			if (_host?.DesktopWindowXamlSource is { } dwxs)
-			{
-				RectInt32 clientRect = new((int)(bottomRightPoint.X - windowSize.Width), (int)(bottomRightPoint.Y - windowSize.Height), (int)windowSize.Width, (int)windowSize.Height);
-
-				dwxs.SiteBridge.MoveAndResize(clientRect);
-
-				HRGN region = PInvoke.CreateRectRgn(clientRect.X, clientRect.Y, bottomRightPoint.X, bottomRightPoint.Y);
-				PInvoke.SetWindowRgn(_host.HWnd, region, false);
-			}
+			UpdateFlyoutRegion();
+			UpdateBackdropVisual();
 		}
 
 		private async void HostWindow_Inactivated(object? sender, EventArgs e)
@@ -208,7 +200,7 @@ namespace U5BFA.ShellFlyout
 
 		public void Dispose()
 		{
-			if (_backdropLink is not null) BackdropManager?.RemoveLink(_backdropLink);
+			DiscardContentBackdrop();
 			_host?.WindowInactivated -= HostWindow_Inactivated;
 			_host?.Dispose();
 		}

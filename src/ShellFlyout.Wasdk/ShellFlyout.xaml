@@ -41,6 +41,8 @@
 	</Style>
 
 	<Style x:Key="DefaultWindows11ShellFlyoutStyle" TargetType="local:ShellFlyout">
+		<Setter Property="HorizontalAlignment" Value="Right" />
+		<Setter Property="VerticalAlignment" Value="Bottom" />
 		<Setter Property="Margin" Value="12" />
 		<Setter Property="CornerRadius" Value="{StaticResource OverlayCornerRadius}" />
 		<Setter Property="BorderThickness" Value="0" />
