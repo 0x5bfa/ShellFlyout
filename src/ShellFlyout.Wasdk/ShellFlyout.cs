@@ -4,43 +4,29 @@
 using Microsoft.UI.Content;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
-using Microsoft.UI.Xaml.Hosting;
 using System;
 using System.Diagnostics;
 using System.Threading.Tasks;
 
 namespace U5BFA.ShellFlyout
 {
-	public partial class ShellFlyout : ContentControl, IDisposable
+	public partial class ShellFlyout : Control, IDisposable
 	{
 		private const string PART_RootGrid = "PART_RootGrid";
-		private const string PART_SystemBackdropTargetGrid = "PART_SystemBackdropTargetGrid";
-		private const string PART_MainContentPresenter = "PART_MainContentPresenter";
+		private const string PART_IslandsGrid = "PART_IslandsGrid";
 
 		private readonly XamlIslandHostWindow? _host;
 
-		private ContentExternalBackdropLink? _backdropLink;
-		private bool _isBackdropLinkInitialized;
-		private long _propertyChangedCallbackTokenForContentProperty;
-		private long _propertyChangedCallbackTokenForCornerRadiusProperty;
-
 		private Grid? RootGrid;
-		private Grid? SystemBackdropTargetGrid;
-		private ContentPresenter? MainContentPresenter;
+		private Grid? IslandsGrid;
 
 		public bool IsOpen { get; private set; }
-
-		public bool IsAnimationPlaying { get; private set; }
-
-		public double SiteViewRasterizationScale => _host?.DesktopWindowXamlSource?.SiteBridge.SiteView.RasterizationScale ?? RasterizationScale;
 
 		public event EventHandler? Inactivated;
 
 		public ShellFlyout()
 		{
 			DefaultStyleKey = typeof(ShellFlyout);
-
-			VerticalAlignment = VerticalAlignment.Bottom;
 
 			_host = new XamlIslandHostWindow();
 			_host.Initialize(this);
@@ -50,31 +36,16 @@ namespace U5BFA.ShellFlyout
 
 		protected override void OnApplyTemplate()
 		{
-			Debug.WriteLine("OnApplyTemplate");
-
 			base.OnApplyTemplate();
 
 			RootGrid = GetTemplateChild(PART_RootGrid) as Grid
 				?? throw new MissingFieldException($"Could not find {PART_RootGrid} in the given {nameof(ShellFlyout)}'s style.");
-			SystemBackdropTargetGrid = GetTemplateChild(PART_SystemBackdropTargetGrid) as Grid
-				?? throw new MissingFieldException($"Could not find {PART_SystemBackdropTargetGrid} in the given {nameof(ShellFlyout)}'s style.");
-			MainContentPresenter = GetTemplateChild(PART_MainContentPresenter) as ContentPresenter
-				?? throw new MissingFieldException($"Could not find {PART_MainContentPresenter} in the given {nameof(ShellFlyout)}'s style.");
-
-			_propertyChangedCallbackTokenForContentProperty = RegisterPropertyChangedCallback(ContentProperty, (s, e) => ((ShellFlyout)s).OnContentChanged());
-			_propertyChangedCallbackTokenForCornerRadiusProperty = RegisterPropertyChangedCallback(CornerRadiusProperty, (s, e) => ((ShellFlyout)s).OnCornerRadiusChanged());
+			IslandsGrid = GetTemplateChild(PART_IslandsGrid) as Grid
+				?? throw new MissingFieldException($"Could not find {PART_IslandsGrid} in the given {nameof(ShellFlyout)}'s style.");
 
 			Unloaded += ShellFlyout_Unloaded;
 
-			OnContentChanged();
-		}
-
-		private void ShellFlyout_Unloaded(object sender, RoutedEventArgs e)
-		{
-			Unloaded -= ShellFlyout_Unloaded;
-
-			UnregisterPropertyChangedCallback(ContentProperty, _propertyChangedCallbackTokenForContentProperty);
-			UnregisterPropertyChangedCallback(CornerRadiusProperty, _propertyChangedCallbackTokenForCornerRadiusProperty);
+			UpdateIslands();
 		}
 
 		public async Task OpenFlyoutAsync()
@@ -82,16 +53,12 @@ namespace U5BFA.ShellFlyout
 			if (_host?.DesktopWindowXamlSource is null)
 				return;
 
-			Debug.WriteLine("OpenFlyout in");
-
 			_host.MaximizeHWnd();
 			_host.MaximizeXamlIslandHWnd();
+
 			UpdateFlyoutRegion();
 
-			if (IsBackdropEnabled)
-				EnsureContentBackdrop();
-			else
-				DiscardContentBackdrop();
+			UpdateBackdropVisual();
 
 			UpdateLayout();
 			await Task.Delay(1);
@@ -108,14 +75,10 @@ namespace U5BFA.ShellFlyout
 			}
 
 			IsOpen = true;
-
-			Debug.WriteLine("OpenFlyout out");
 		}
 
 		public async Task CloseFlyoutAsync()
 		{
-			Debug.WriteLine("CloseFlyoutAsync in");
-
 			if (IsTransitionAnimationEnabled && RootGrid is not null)
 			{
 				var storyboard = PopupDirection is Orientation.Vertical
@@ -128,55 +91,83 @@ namespace U5BFA.ShellFlyout
 			_host?.UpdateWindowVisibility(false);
 
 			IsOpen = false;
-
-			Debug.WriteLine("CloseFlyoutAsync out");
 		}
 
-		private void EnsureContentBackdrop()
+		internal ContentExternalBackdropLink? CreateBackdropLink()
 		{
-			if (SystemBackdropTargetGrid is null || _isBackdropLinkInitialized)
-				return;
-
-			_backdropLink = BackdropManager?.CreateLink();
-			_isBackdropLinkInitialized = true;
-			UpdateBackdropVisual();
+			return BackdropManager?.CreateLink();
 		}
 
-		private void DiscardContentBackdrop()
+		internal void DiscardBackdropLink(ContentExternalBackdropLink backdropLink)
 		{
-			if (_backdropLink is null)
+			BackdropManager?.RemoveLink(backdropLink);
+		}
+
+		private void UpdateIslands()
+		{
+			if (IslandsGrid is null)
 				return;
 
-			BackdropManager?.RemoveLink(_backdropLink);
-			_backdropLink = null;
-			_isBackdropLinkInitialized = false;
+			IslandsGrid.Children.Clear();
+			IslandsGrid.RowDefinitions.Clear();
+			IslandsGrid.ColumnDefinitions.Clear();
+
+			if (IslandsOrientation is Orientation.Vertical)
+			{
+				for (int index = 0; index < Islands.Count; index++)
+				{
+					if (Islands[index] is not ShellFlyoutIsland island)
+						continue;
+
+					IslandsGrid.RowDefinitions.Add(new() { Height = GridLength.Auto });
+					Grid.SetRow(island, index);
+					Grid.SetColumn(island, 0);
+					island.SetOwner(this);
+					IslandsGrid.Children.Add(island);
+				}
+			}
+			else
+			{
+				for (int index = 0; index < Islands.Count; index++)
+				{
+
+					if (Islands[index] is not ShellFlyoutIsland island)
+						continue;
+
+					IslandsGrid.ColumnDefinitions.Add(new() { Width = GridLength.Auto });
+					Grid.SetRow(island, 0);
+					Grid.SetColumn(island, index);
+					island.SetOwner(this);
+					IslandsGrid.Children.Add(island);
+				}
+			}
 		}
 
 		private void UpdateBackdropVisual()
 		{
-			if (SystemBackdropTargetGrid is null || _backdropLink is null)
-				return;
+			foreach (var island in Islands)
+			{
+				if (island is null)
+					continue;
 
-			var requestedWidth = (float)((FrameworkElement)Content).Width;
-			var requestedHeight = (float)((FrameworkElement)Content).Height;
-
-			_backdropLink.PlacementVisual.Size = new(requestedWidth, requestedHeight);
-			_backdropLink.PlacementVisual.Clip = _backdropLink.PlacementVisual.Compositor.CreateRectangleClip(0, 0, requestedWidth, requestedHeight,
-				new(Convert.ToSingle(SystemBackdropTargetGrid.CornerRadius.TopLeft), Convert.ToSingle(SystemBackdropTargetGrid.CornerRadius.TopLeft)),
-				new(Convert.ToSingle(SystemBackdropTargetGrid.CornerRadius.TopRight), Convert.ToSingle(SystemBackdropTargetGrid.CornerRadius.TopRight)),
-				new(Convert.ToSingle(SystemBackdropTargetGrid.CornerRadius.BottomRight), Convert.ToSingle(SystemBackdropTargetGrid.CornerRadius.BottomRight)),
-				new(Convert.ToSingle(SystemBackdropTargetGrid.CornerRadius.BottomLeft), Convert.ToSingle(SystemBackdropTargetGrid.CornerRadius.BottomLeft)));
-
-			ElementCompositionPreview.SetElementChildVisual(SystemBackdropTargetGrid, _backdropLink.PlacementVisual);
+				if (IsBackdropEnabled)
+				{
+					island.EnsureContentBackdrop();
+				}
+				else
+				{
+					island.DiscardContentBackdrop();
+				}
+			}
 		}
 
 		private void UpdateFlyoutRegion()
 		{
-			if (_host?.DesktopWindowXamlSource is null)
+			if (_host?.DesktopWindowXamlSource is null || IslandsGrid is null)
 				return;
 
-			var flyoutWidth = (((FrameworkElement)Content).Width + Margin.Left + Margin.Right) * SiteViewRasterizationScale;
-			var flyoutHeight = (((FrameworkElement)Content).Height + Margin.Top + Margin.Bottom) * SiteViewRasterizationScale;
+			var flyoutWidth = (IslandsGrid.ActualWidth + Margin.Left + Margin.Right) * RasterizationScale;
+			var flyoutHeight = (IslandsGrid.ActualHeight + Margin.Top + Margin.Bottom) * RasterizationScale;
 
 			_host?.SetHWndRectRegion(new(
 				(int)(_host.WindowSize.Width - flyoutWidth),
@@ -185,10 +176,9 @@ namespace U5BFA.ShellFlyout
 				(int)_host.WindowSize.Height));
 		}
 
-		private void Content_SizeChanged(object sender, SizeChangedEventArgs e)
+		private void ShellFlyout_Unloaded(object sender, RoutedEventArgs e)
 		{
-			UpdateFlyoutRegion();
-			UpdateBackdropVisual();
+			Unloaded -= ShellFlyout_Unloaded;
 		}
 
 		private async void HostWindow_Inactivated(object? sender, EventArgs e)
@@ -200,7 +190,7 @@ namespace U5BFA.ShellFlyout
 
 		public void Dispose()
 		{
-			DiscardContentBackdrop();
+			BackdropManager?.Dispose();
 			_host?.WindowInactivated -= HostWindow_Inactivated;
 			_host?.Dispose();
 		}

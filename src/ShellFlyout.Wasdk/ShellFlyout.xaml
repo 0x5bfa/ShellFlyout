@@ -5,10 +5,12 @@
 	xmlns:local="using:U5BFA.ShellFlyout">
 
 	<Style BasedOn="{StaticResource DefaultWindows11ShellFlyoutStyle}" TargetType="local:ShellFlyout" />
+	<Style BasedOn="{StaticResource DefaultShellFlyoutIslandStyle}" TargetType="local:ShellFlyoutIsland" />
 
-	<Style x:Key="DefaultWindows10ShellFlyoutStyle" TargetType="local:ShellFlyout">
-		<Setter Property="Margin" Value="0" />
-		<Setter Property="CornerRadius" Value="0" />
+	<Style x:Key="DefaultWindows11ShellFlyoutStyle" TargetType="local:ShellFlyout">
+		<Setter Property="HorizontalAlignment" Value="Right" />
+		<Setter Property="VerticalAlignment" Value="Bottom" />
+		<Setter Property="Margin" Value="12" />
 		<Setter Property="BorderThickness" Value="0" />
 		<Setter Property="BorderBrush" Value="{ThemeResource CardStrokeColorDefaultBrush}" />
 		<Setter Property="AutomationProperties.LandmarkType" Value="Navigation" />
@@ -18,55 +20,47 @@
 				<ControlTemplate TargetType="local:ShellFlyout">
 					<Grid
 						x:Name="PART_RootGrid"
-						Margin="{TemplateBinding Margin}"
 						BorderBrush="{TemplateBinding BorderBrush}"
 						BorderThickness="{TemplateBinding BorderThickness}"
-						CornerRadius="{TemplateBinding CornerRadius}"
-						RenderTransformOrigin="0.5,0.5"
-						Translation="0,0,32">
+						RenderTransformOrigin="0.5,0.5">
 						<Grid.RenderTransform>
 							<TranslateTransform X="0" Y="0" />
 						</Grid.RenderTransform>
-						<Grid.Shadow>
-							<ThemeShadow />
-						</Grid.Shadow>
 
-						<Grid x:Name="PART_SystemBackdropTargetGrid" CornerRadius="{TemplateBinding CornerRadius}" />
-
-						<ContentPresenter x:Name="PART_MainContentPresenter" />
+						<Grid
+							x:Name="PART_IslandsGrid"
+							ColumnSpacing="12"
+							RowSpacing="12" />
 					</Grid>
 				</ControlTemplate>
 			</Setter.Value>
 		</Setter>
 	</Style>
 
-	<Style x:Key="DefaultWindows11ShellFlyoutStyle" TargetType="local:ShellFlyout">
-		<Setter Property="HorizontalAlignment" Value="Right" />
-		<Setter Property="VerticalAlignment" Value="Bottom" />
-		<Setter Property="Margin" Value="12" />
+	<Style x:Key="DefaultShellFlyoutIslandStyle" TargetType="local:ShellFlyoutIsland">
+		<Setter Property="HorizontalAlignment" Value="Stretch" />
+		<Setter Property="VerticalAlignment" Value="Stretch" />
+		<Setter Property="HorizontalContentAlignment" Value="Stretch" />
+		<Setter Property="HorizontalContentAlignment" Value="Stretch" />
 		<Setter Property="CornerRadius" Value="{StaticResource OverlayCornerRadius}" />
-		<Setter Property="BorderThickness" Value="0" />
-		<Setter Property="BorderBrush" Value="{ThemeResource CardStrokeColorDefaultBrush}" />
+		<Setter Property="BorderThickness" Value="1" />
+		<Setter Property="BorderBrush" Value="{ThemeResource SurfaceStrokeColorDefaultBrush}" />
 		<Setter Property="AutomationProperties.LandmarkType" Value="Navigation" />
 		<Setter Property="IsTabStop" Value="False" />
 		<Setter Property="Template">
 			<Setter.Value>
-				<ControlTemplate TargetType="local:ShellFlyout">
+				<ControlTemplate TargetType="local:ShellFlyoutIsland">
 					<Grid
 						x:Name="PART_RootGrid"
 						BorderBrush="{TemplateBinding BorderBrush}"
 						BorderThickness="{TemplateBinding BorderThickness}"
 						CornerRadius="{TemplateBinding CornerRadius}"
-						RenderTransformOrigin="0.5,0.5"
 						Translation="0,0,32">
-						<Grid.RenderTransform>
-							<TranslateTransform X="0" Y="0" />
-						</Grid.RenderTransform>
 						<Grid.Shadow>
 							<ThemeShadow />
 						</Grid.Shadow>
 
-						<Grid x:Name="PART_SystemBackdropTargetGrid" CornerRadius="{TemplateBinding CornerRadius}" />
+						<Grid x:Name="PART_BackdropTargetGrid" CornerRadius="{TemplateBinding CornerRadius}" />
 
 						<ContentPresenter x:Name="PART_MainContentPresenter" />
 					</Grid>
