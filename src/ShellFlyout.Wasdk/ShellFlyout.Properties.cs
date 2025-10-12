@@ -2,6 +2,7 @@
 // Licensed under the MIT license.
 
 using CommunityToolkit.WinUI;
+using Microsoft.UI.Composition.SystemBackdrops;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Controls.Primitives;
@@ -36,12 +37,8 @@ namespace U5BFA.ShellFlyout
 		[GeneratedDependencyProperty(DefaultValue = true)]
 		public partial bool IsTransitionAnimationEnabled { get; set; }
 
-		public ContentBackdropManager? BackdropManager { get; set; }
-
-		partial void OnIsBackdropEnabledChanged(bool newValue)
-		{
-			UpdateBackdropVisual();
-		}
+		[GeneratedDependencyProperty]
+		public partial ISystemBackdropControllerWithTargets? BackdropController { get; set; }
 
 		partial void OnIslandsSourcePropertyChanged(DependencyPropertyChangedEventArgs e)
 		{
@@ -56,6 +53,22 @@ namespace U5BFA.ShellFlyout
 			}
 
 			UpdateIslands();
+		}
+
+		partial void OnIsBackdropEnabledPropertyChanged(DependencyPropertyChangedEventArgs e)
+		{
+			if ((bool)e.NewValue == (bool)e.OldValue)
+				return;
+
+			UpdateBackdrop();
+		}
+
+		partial void OnBackdropControllerPropertyChanged(DependencyPropertyChangedEventArgs e)
+		{
+			if (e.NewValue == e.OldValue)
+				return;
+
+			UpdateBackdropManager();
 		}
 	}
 }

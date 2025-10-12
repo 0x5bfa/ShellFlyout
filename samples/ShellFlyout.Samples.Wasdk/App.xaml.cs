@@ -25,8 +25,6 @@ namespace U5BFA.ShellFlyout
 			_window = new MainWindow();
 			_window.Activate();
 			_window.DispatcherQueue.EnsureSystemDispatcherQueue();
-			_backdropManager = ContentBackdropManager.Create(new DesktopAcrylicController(), _window.Compositor, ((FrameworkElement)_window.Content).ActualTheme)
-				?? throw new ArgumentNullException($"Failed to get a valid instance from {ContentBackdropManager.Create}.");
 
 			_systemTrayIcon = new SystemTrayIcon()
 			{
@@ -35,7 +33,7 @@ namespace U5BFA.ShellFlyout
 				Id = new Guid("28DE460A-8BD6-4539-A406-5F685584FD4D")
 			};
 
-			MainShellFlyout = new MainShellFlyout() { BackdropManager = _backdropManager };
+			MainShellFlyout = new MainShellFlyout();
 
 			_systemTrayIcon.Show();
 			_systemTrayIcon.LeftClicked += SystemTrayIcon_LeftClicked;

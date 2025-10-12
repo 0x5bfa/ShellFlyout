@@ -2,7 +2,8 @@
 	xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
 	xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
 	xmlns:animatedvisuals="using:Microsoft.UI.Xaml.Controls.AnimatedVisuals"
-	xmlns:local="using:U5BFA.ShellFlyout">
+	xmlns:local="using:U5BFA.ShellFlyout"
+	xmlns:systembackdrops="using:Microsoft.UI.Composition.SystemBackdrops">
 
 	<Style BasedOn="{StaticResource DefaultWindows11ShellFlyoutStyle}" TargetType="local:ShellFlyout" />
 	<Style BasedOn="{StaticResource DefaultShellFlyoutIslandStyle}" TargetType="local:ShellFlyoutIsland" />

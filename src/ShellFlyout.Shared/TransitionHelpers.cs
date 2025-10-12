@@ -13,7 +13,7 @@ using Microsoft.UI.Xaml.Media.Animation;
 
 namespace U5BFA.ShellFlyout
 {
-	internal unsafe static class TransitionHelpers
+	internal static class TransitionHelpers
 	{
 		internal static Storyboard GetWindows11BottomToTopTransitionStoryboard(DependencyObject target, int from, int to)
 		{

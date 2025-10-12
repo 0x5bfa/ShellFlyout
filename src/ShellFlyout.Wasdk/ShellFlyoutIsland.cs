@@ -19,7 +19,7 @@ namespace U5BFA.ShellFlyout
 
 		private WeakReference<ShellFlyout>? _owner;
 		private ContentExternalBackdropLink? _backdropLink;
-		private bool _isBackdropLinkInitialized;
+		private bool _isBackdropLinkAttached;
 		private long _propertyChangedCallbackTokenForContentProperty;
 		private long _propertyChangedCallbackTokenForCornerRadiusProperty;
 
@@ -62,24 +62,43 @@ namespace U5BFA.ShellFlyout
 			_owner = new(owner);
 		}
 
-		internal void EnsureContentBackdrop()
+		internal void UpdateBackdrop(bool isEnabled, bool coerce = false)
 		{
-			if (BackdropTargetGrid is null || _isBackdropLinkInitialized || _owner is null || !_owner.TryGetTarget(out var owner))
+			if (_owner is null || !_owner.TryGetTarget(out var owner))
 				return;
 
-			_backdropLink = owner.CreateBackdropLink();
-			_isBackdropLinkInitialized = true;
-			UpdateBackdropVisual();
-		}
+			if (isEnabled)
+			{
+				if (_isBackdropLinkAttached)
+				{
+					if (coerce)
+					{
+						if (_backdropLink is null)
+							return;
 
-		internal void DiscardContentBackdrop()
-		{
-			if (_backdropLink is null || _owner is null || !_owner.TryGetTarget(out var owner))
-				return;
+						owner.DiscardBackdropLink(_backdropLink);
+						_backdropLink = null;
+						_isBackdropLinkAttached = false;
+					}
+					else
+					{
+						return;
+					}
+				}
 
-			owner.DiscardBackdropLink(_backdropLink);
-			_backdropLink = null;
-			_isBackdropLinkInitialized = false;
+				_backdropLink = owner.CreateBackdropLink();
+				_isBackdropLinkAttached = true;
+				UpdateBackdropVisual();
+			}
+			else
+			{
+				if (_backdropLink is null)
+					return;
+
+				owner.DiscardBackdropLink(_backdropLink);
+				_backdropLink = null;
+				_isBackdropLinkAttached = false;
+			}
 		}
 
 		internal void UpdateBackdropVisual()

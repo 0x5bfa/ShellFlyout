@@ -4,6 +4,7 @@
 using Microsoft.UI.Content;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
+using Microsoft.UI.Xaml.Hosting;
 using System;
 using System.Diagnostics;
 using System.Threading.Tasks;
@@ -16,6 +17,9 @@ namespace U5BFA.ShellFlyout
 		private const string PART_IslandsGrid = "PART_IslandsGrid";
 
 		private readonly XamlIslandHostWindow? _host;
+		private ContentBackdropManager? _backdropManager;
+		private bool _wasTaskbarDark;
+		private bool _wasTaskbarColorPrevalence;
 
 		private Grid? RootGrid;
 		private Grid? IslandsGrid;
@@ -57,8 +61,8 @@ namespace U5BFA.ShellFlyout
 			_host.MaximizeXamlIslandHWnd();
 
 			UpdateFlyoutRegion();
-
-			UpdateBackdropVisual();
+			UpdateFlyoutTheme();
+			UpdateBackdropManager();
 
 			UpdateLayout();
 			await Task.Delay(1);
@@ -95,12 +99,52 @@ namespace U5BFA.ShellFlyout
 
 		internal ContentExternalBackdropLink? CreateBackdropLink()
 		{
-			return BackdropManager?.CreateLink();
+			return _backdropManager?.CreateLink();
 		}
 
 		internal void DiscardBackdropLink(ContentExternalBackdropLink backdropLink)
 		{
-			BackdropManager?.RemoveLink(backdropLink);
+			_backdropManager?.RemoveLink(backdropLink);
+		}
+
+		private void UpdateBackdropManager()
+		{
+			var _isTaskbarDark = RegistryHelpers.IsTaskbarLight();
+			var _isTaskbarColorPrevalence = RegistryHelpers.IsTaskbarColorPrevalenceEnabled();
+			bool shouldUpdateBackdrop = _wasTaskbarDark != _isTaskbarDark || _wasTaskbarColorPrevalence != _isTaskbarColorPrevalence;
+			_wasTaskbarDark = _isTaskbarDark;
+			_wasTaskbarColorPrevalence = _isTaskbarColorPrevalence;
+			if (!shouldUpdateBackdrop)
+				return;
+
+			var controller = BackdropController
+				?? (_isTaskbarColorPrevalence
+					? BackdropControllerHelpers.GetAccentedAcrylicController(Resources)
+					: _isTaskbarDark
+						? BackdropControllerHelpers.GetLightAcrylicController(Resources)
+						: BackdropControllerHelpers.GetDarkAcrylicController(Resources));
+			if (controller is null)
+				return;
+
+			_backdropManager?.Dispose();
+			_backdropManager = null;
+			_backdropManager = ContentBackdropManager.Create(controller, ElementCompositionPreview.GetElementVisual(IslandsGrid).Compositor, ActualTheme);
+
+			UpdateBackdrop(true);
+		}
+
+		private void UpdateFlyoutTheme()
+		{
+			if (RegistryHelpers.IsTaskbarLight())
+			{
+				foreach (var island in Islands)
+					island.RequestedTheme = ElementTheme.Light;
+			}
+			else
+			{
+				foreach (var island in Islands)
+					island.RequestedTheme = ElementTheme.Dark;
+			}
 		}
 
 		private void UpdateIslands()
@@ -143,21 +187,11 @@ namespace U5BFA.ShellFlyout
 			}
 		}
 
-		private void UpdateBackdropVisual()
+		private void UpdateBackdrop(bool coerce = false)
 		{
 			foreach (var island in Islands)
 			{
-				if (island is null)
-					continue;
-
-				if (IsBackdropEnabled)
-				{
-					island.EnsureContentBackdrop();
-				}
-				else
-				{
-					island.DiscardContentBackdrop();
-				}
+				island.UpdateBackdrop(IsBackdropEnabled, coerce);
 			}
 		}
 
@@ -190,7 +224,7 @@ namespace U5BFA.ShellFlyout
 
 		public void Dispose()
 		{
-			BackdropManager?.Dispose();
+			_backdropManager?.Dispose();
 			_host?.WindowInactivated -= HostWindow_Inactivated;
 			_host?.Dispose();
 		}
