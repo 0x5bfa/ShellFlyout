@@ -9,6 +9,7 @@
   <Folder Name="/global/">
     <File Path=".github/workflows/cd.yml" />
     <File Path=".github/workflows/ci.yml" />
+    <File Path="nuget.config" />
     <File Path="README.md" />
   </Folder>
 
