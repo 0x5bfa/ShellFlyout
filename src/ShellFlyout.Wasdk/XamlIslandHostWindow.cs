@@ -67,20 +67,16 @@ namespace U5BFA.ShellFlyout
 			PInvoke.RegisterClass(&wndClass);
 
 			HWnd = PInvoke.CreateWindowEx(
-				WINDOW_EX_STYLE.WS_EX_NOREDIRECTIONBITMAP | WINDOW_EX_STYLE.WS_EX_TOOLWINDOW | WINDOW_EX_STYLE.WS_EX_LAYERED,
+				WINDOW_EX_STYLE.WS_EX_NOREDIRECTIONBITMAP | WINDOW_EX_STYLE.WS_EX_TOOLWINDOW | WINDOW_EX_STYLE.WS_EX_TOPMOST,
 				(PCWSTR)Unsafe.AsPointer(ref Unsafe.AsRef(in WindowClassName.GetPinnableReference())),
 				(PCWSTR)Unsafe.AsPointer(ref Unsafe.AsRef(in WindowName.GetPinnableReference())),
-				WINDOW_STYLE.WS_POPUP | WINDOW_STYLE.WS_VISIBLE | WINDOW_STYLE.WS_SYSMENU,
-				0, 0, 0, 0, HWND.Null, HMENU.Null, wndClass.hInstance, null);
+				WINDOW_STYLE.WS_POPUP, 0, 0, 0, 0, HWND.Null, HMENU.Null, wndClass.hInstance, null);
 
 			PInvoke.SetLayeredWindowAttributes(HWnd, (COLORREF)0, 255, LAYERED_WINDOW_ATTRIBUTES_FLAGS.LWA_ALPHA);
 
 			DesktopWindowXamlSource = new();
 			DesktopWindowXamlSource.Initialize(Win32Interop.GetWindowIdFromWindow(HWnd));
 			DesktopWindowXamlSource.Content = content;
-
-			nint dwIslandHWndExStlye = PInvoke.GetWindowLongPtr((HWND)DesktopWindowXamlSource.SiteBridge.WindowId.Value, WINDOW_LONG_PTR_INDEX.GWL_EXSTYLE);
-			PInvoke.SetWindowLongPtr((HWND)DesktopWindowXamlSource.SiteBridge.WindowId.Value, WINDOW_LONG_PTR_INDEX.GWL_EXSTYLE, dwIslandHWndExStlye | (nint)WINDOW_EX_STYLE.WS_EX_LAYERED);
 
 			PInvoke.SetLayeredWindowAttributes((HWND)DesktopWindowXamlSource.SiteBridge.WindowId.Value, (COLORREF)0, 255, LAYERED_WINDOW_ATTRIBUTES_FLAGS.LWA_ALPHA);
 		}
