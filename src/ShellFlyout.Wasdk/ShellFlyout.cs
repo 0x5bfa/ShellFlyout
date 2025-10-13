@@ -57,9 +57,7 @@ namespace U5BFA.ShellFlyout
 			if (_host?.DesktopWindowXamlSource is null)
 				return;
 
-			_host.MaximizeHWnd();
-			_host.MaximizeXamlIslandHWnd();
-
+			_host.Maximize();
 			UpdateFlyoutRegion();
 			UpdateFlyoutTheme();
 			UpdateBackdropManager();

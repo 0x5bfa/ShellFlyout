@@ -7,7 +7,6 @@ using Microsoft.UI.Xaml.Hosting;
 using System;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
-using System.Runtime.InteropServices.JavaScript;
 using Windows.Foundation;
 using Windows.Graphics;
 using Windows.Win32;
@@ -81,18 +80,23 @@ namespace U5BFA.ShellFlyout
 			PInvoke.SetLayeredWindowAttributes((HWND)DesktopWindowXamlSource.SiteBridge.WindowId.Value, (COLORREF)0, 255, LAYERED_WINDOW_ATTRIBUTES_FLAGS.LWA_ALPHA);
 		}
 
-		internal void MaximizeHWnd()
+		internal void MoveAndResize(RectInt32 rect)
 		{
-			var bottomRightPoint = WindowHelpers.GetBottomRightCornerPoint();
-			PInvoke.SetWindowPos(HWnd, HWND.HWND_TOP, 0, 0, bottomRightPoint.X, bottomRightPoint.Y, 0U);
+			if (DesktopWindowXamlSource is null)
+				return;
+
+			PInvoke.SetWindowPos(HWnd, HWND.HWND_TOP, rect.X, rect.Y, rect.Width, rect.Height, 0U);
+			PInvoke.SetWindowPos((HWND)DesktopWindowXamlSource.SiteBridge.WindowId.Value, HWND.HWND_TOP, 0, 0, rect.Width, rect.Height, 0U);
 		}
 
-		internal void MaximizeXamlIslandHWnd()
+		internal void Maximize()
 		{
 			if (DesktopWindowXamlSource is null)
 				return;
 
 			var bottomRightPoint = WindowHelpers.GetBottomRightCornerPoint();
+			PInvoke.SetWindowPos(HWnd, HWND.HWND_TOP, 0, 0, bottomRightPoint.X, bottomRightPoint.Y, 0U);
+
 			PInvoke.SetWindowPos((HWND)DesktopWindowXamlSource.SiteBridge.WindowId.Value, HWND.HWND_TOP, 0, 0, bottomRightPoint.X, bottomRightPoint.Y, 0U);
 		}
 

@@ -10,10 +10,22 @@
 
 	<local:ShellFlyout.Islands>
 		<local:ShellFlyoutIsland Height="300">
-			<TextBlock
+			<!--<TextBlock
 				HorizontalAlignment="Center"
 				VerticalAlignment="Center"
-				Text="Island 1" />
+				Text="Island 1" />-->
+			<Button
+				HorizontalAlignment="Center"
+				VerticalAlignment="Center"
+				Content="Button">
+				<Button.Flyout>
+					<MenuFlyout>
+						<MenuFlyoutItem Text="A" />
+						<MenuFlyoutItem Text="A" />
+						<MenuFlyoutItem Text="A" />
+					</MenuFlyout>
+				</Button.Flyout>
+			</Button>
 		</local:ShellFlyoutIsland>
 		<local:ShellFlyoutIsland Height="300">
 			<TextBlock

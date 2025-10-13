@@ -1,5 +1,5 @@
 <h1 align="center">Shell Flyout</h1>
-<p align="center">Empower you app with a shell flyout that pops up from a task tray.</p>
+<p align="center">Empower your app with a shell flyout that pops up from a tray icon.</p>
 
 ## Building from the source
 
@@ -14,9 +14,13 @@
 3. Open the solution
 4. Build the solution
 
-## Use the package
+## Installing the package
 
-This source code is packaged and published to NuGet.org, see the package in NuGet Gallery.
+*Coming soon*
+
+## Usage
+
+*Coming soon*
 
 ## Screenshot
 
