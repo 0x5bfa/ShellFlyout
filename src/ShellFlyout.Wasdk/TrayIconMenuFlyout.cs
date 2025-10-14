@@ -11,7 +11,7 @@ using Windows.Win32;
 
 namespace U5BFA.ShellFlyout
 {
-	public partial class TrayIconMenuFlyout
+	public partial class TrayIconMenuFlyout : Control
 	{
 		private readonly XamlIslandHostWindow? _host;
 		private readonly Grid _flyoutPlacementTarget;
@@ -23,11 +23,18 @@ namespace U5BFA.ShellFlyout
 		{
 			_flyoutPlacementTarget = new Grid() { Background = new SolidColorBrush(Colors.Black) };
 			_menuFlyout = menuFlyout;
+			_menuFlyout.Opened += MenuFlyout_Opened;
 
 			_host = new XamlIslandHostWindow();
 			_host.Initialize(_flyoutPlacementTarget);
 			_host.UpdateWindowVisibility(false);
 			//_host.WindowInactivated += HostWindow_Inactivated;
+		}
+
+		private void MenuFlyout_Opened(object? sender, object e)
+		{
+			if (sender is not MenuFlyout menuFlyout)
+				return;
 		}
 
 		public unsafe void Show()
@@ -38,11 +45,13 @@ namespace U5BFA.ShellFlyout
 			if (_menuFlyout.IsOpen)
 				_menuFlyout.Hide();
 
+			UpdateFlyoutTheme();
+
 			Point cursorPos;
 			PInvoke.GetCursorPos(&cursorPos);
 
-			_host?.MoveAndResize(new(cursorPos.X, cursorPos.Y, 100, 100));
-			_host?.SetHWndRectRegion(new(cursorPos.X, cursorPos.Y, 100, 100));
+			_host?.MoveAndResize(new(cursorPos.X, cursorPos.Y - 20, 1, 1));
+			_host?.SetHWndRectRegion(new(0, 0, 1, 1));
 			_host?.UpdateWindowVisibility(true);
 
 			var options = new FlyoutShowOptions()
@@ -57,6 +66,10 @@ namespace U5BFA.ShellFlyout
 		{
 			_menuFlyout?.Hide();
 			_host?.UpdateWindowVisibility(false);
+		}
+
+		private void UpdateFlyoutTheme()
+		{
 		}
 	}
 }

@@ -6,7 +6,11 @@
 	xmlns:local="using:U5BFA.ShellFlyout"
 	xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
 	mc:Ignorable="d">
-	<MenuFlyoutItem Text="A" />
+	<MenuFlyoutSubItem Text="A">
+		<MenuFlyoutItem Text="A" />
+		<MenuFlyoutItem Text="A" />
+		<MenuFlyoutItem Text="A" />
+	</MenuFlyoutSubItem>
 	<MenuFlyoutItem Text="A" />
 	<MenuFlyoutItem Text="A" />
 </MenuFlyout>

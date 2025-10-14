@@ -22,5 +22,10 @@ namespace U5BFA.ShellFlyout
 			var value = key?.GetValue("ColorPrevalence");
 			return value is int v && v != 0;
 		}
+
+		internal static bool IsTrayIconInOverflowFlyout()
+		{
+			return false;
+		}
 	}
 }

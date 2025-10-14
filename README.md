@@ -24,4 +24,4 @@
 
 ## Screenshot
 
-*Coming soon.*
+<img alt="ss1" src="https://github.com/user-attachments/assets/be7c14d2-b5b4-483d-9c7b-9e6ca1be7ea5" />
