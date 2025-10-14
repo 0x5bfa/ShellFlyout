@@ -24,4 +24,4 @@
 
 ## Screenshot
 
-<img alt="ss1" src="https://github.com/user-attachments/assets/be7c14d2-b5b4-483d-9c7b-9e6ca1be7ea5" />
+https://github.com/user-attachments/assets/95a63647-1f96-4035-a65d-1b602112c4bf
