@@ -8,6 +8,8 @@
 	<Style BasedOn="{StaticResource DefaultWindows11ShellFlyoutStyle}" TargetType="local:ShellFlyout" />
 	<Style BasedOn="{StaticResource DefaultShellFlyoutIslandStyle}" TargetType="local:ShellFlyoutIsland" />
 
+	<Style BasedOn="{StaticResource DefaultWindows11TrayIconMenuFlyoutStyle}" TargetType="local:TrayIconMenuFlyout" />
+
 	<Style x:Key="DefaultWindows11ShellFlyoutStyle" TargetType="local:ShellFlyout">
 		<Setter Property="HorizontalAlignment" Value="Right" />
 		<Setter Property="VerticalAlignment" Value="Bottom" />
@@ -64,6 +66,39 @@
 						<Grid x:Name="PART_BackdropTargetGrid" CornerRadius="{TemplateBinding CornerRadius}" />
 
 						<ContentPresenter x:Name="PART_MainContentPresenter" />
+					</Grid>
+				</ControlTemplate>
+			</Setter.Value>
+		</Setter>
+	</Style>
+
+	<Style x:Key="DefaultWindows11TrayIconMenuFlyoutStyle" TargetType="local:TrayIconMenuFlyout">
+		<Setter Property="HorizontalAlignment" Value="Left" />
+		<Setter Property="VerticalAlignment" Value="Top" />
+		<Setter Property="Margin" Value="12" />
+		<Setter Property="BorderThickness" Value="0" />
+		<Setter Property="BorderBrush" Value="{ThemeResource CardStrokeColorDefaultBrush}" />
+		<Setter Property="AutomationProperties.LandmarkType" Value="Navigation" />
+		<Setter Property="IsTabStop" Value="False" />
+		<Setter Property="Template">
+			<Setter.Value>
+				<ControlTemplate TargetType="local:TrayIconMenuFlyout">
+					<Grid
+						x:Name="PART_RootGrid"
+						BorderBrush="{TemplateBinding BorderBrush}"
+						BorderThickness="{TemplateBinding BorderThickness}">
+
+						<Border
+							x:Name="PART_MenuFlyoutTargetControl"
+							Width="5"
+							Height="5"
+							Background="Blue"
+							RenderTransformOrigin="0.5,0.5">
+							<Border.RenderTransform>
+								<TranslateTransform X="0" Y="40" />
+							</Border.RenderTransform>
+						</Border>
+
 					</Grid>
 				</ControlTemplate>
 			</Setter.Value>

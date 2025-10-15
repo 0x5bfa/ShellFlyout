@@ -1,40 +1,61 @@
 ﻿// Copyright (c) 0x5BFA. All rights reserved.
 // Licensed under the MIT license.
 
-using Microsoft.UI;
+using CommunityToolkit.Helpers;
+using CommunityToolkit.WinUI;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Controls.Primitives;
-using Microsoft.UI.Xaml.Media;
+using Microsoft.UI.Xaml.Markup;
+using System;
 using System.Drawing;
 using Windows.Win32;
 
 namespace U5BFA.ShellFlyout
 {
-	public partial class TrayIconMenuFlyout : Control
+	[ContentProperty(Name = nameof(Items))]
+	public partial class TrayIconMenuFlyout : ItemsControl
 	{
+		private const string PART_RootGrid = "PART_RootGrid";
+		private const string PART_MenuFlyoutTargetControl = "PART_MenuFlyoutTargetControl";
+
 		private readonly XamlIslandHostWindow? _host;
-		private readonly Grid _flyoutPlacementTarget;
-		private readonly MenuFlyout? _menuFlyout;
+		private MenuFlyout? _menuFlyout;
 
-		public bool IsOpen => _menuFlyout?.IsOpen ?? false;
+		private Grid? RootGrid;
+		private Border? MenuFlyoutTargetControl;
 
-		public TrayIconMenuFlyout(MenuFlyout menuFlyout)
+		public bool IsOpen { get; private set; }
+
+		public TrayIconMenuFlyout()
 		{
-			_flyoutPlacementTarget = new Grid() { Background = new SolidColorBrush(Colors.Black) };
-			_menuFlyout = menuFlyout;
-			_menuFlyout.Opened += MenuFlyout_Opened;
+			DefaultStyleKey = typeof(TrayIconMenuFlyout);
 
 			_host = new XamlIslandHostWindow();
-			_host.Initialize(_flyoutPlacementTarget);
+			_host.Initialize(this);
 			_host.UpdateWindowVisibility(false);
 			//_host.WindowInactivated += HostWindow_Inactivated;
 		}
 
-		private void MenuFlyout_Opened(object? sender, object e)
+		protected override void OnApplyTemplate()
 		{
-			if (sender is not MenuFlyout menuFlyout)
-				return;
+			base.OnApplyTemplate();
+
+			RootGrid = GetTemplateChild(PART_RootGrid) as Grid
+				?? throw new MissingFieldException($"Could not find {PART_RootGrid} in the given {nameof(ShellFlyout)}'s style.");
+			MenuFlyoutTargetControl = GetTemplateChild(PART_MenuFlyoutTargetControl) as Border
+				?? throw new MissingFieldException($"Could not find {PART_MenuFlyoutTargetControl} in the given {nameof(ShellFlyout)}'s style.");
+		}
+
+		protected override void OnItemsChanged(object e)
+		{
+			base.OnItemsChanged(e);
+
+			_menuFlyout ??= new MenuFlyout();
+			_menuFlyout.Items.Clear();
+
+			foreach (var item in Items)
+				_menuFlyout.Items.Add((MenuFlyoutItemBase)item);
 		}
 
 		public unsafe void Show()
@@ -42,34 +63,46 @@ namespace U5BFA.ShellFlyout
 			if (_menuFlyout is null)
 				return;
 
-			if (_menuFlyout.IsOpen)
-				_menuFlyout.Hide();
-
 			UpdateFlyoutTheme();
 
 			Point cursorPos;
 			PInvoke.GetCursorPos(&cursorPos);
 
-			_host?.MoveAndResize(new(cursorPos.X, cursorPos.Y - 20, 1, 1));
-			_host?.SetHWndRectRegion(new(0, 0, 1, 1));
+			_host?.MoveAndResize(new(cursorPos.X　- 20, cursorPos.Y - 20, 5, 5));
+			_host?.SetHWndRectRegion(new(0, 0, 5, 5));
 			_host?.UpdateWindowVisibility(true);
 
-			var options = new FlyoutShowOptions()
-			{
-				Placement = FlyoutPlacementMode.Top,
-			};
+			//DispatcherQueue.TryEnqueue(() =>
+			//{
+			//	if (_menuFlyout.FindDescendant<MenuFlyoutPresenter>() is { } menuFlyoutPresenter)
+			//	{
+			//	}
+			//});
 
-			_menuFlyout.ShowAt(_flyoutPlacementTarget, options);
+			_menuFlyout.ShowAt(MenuFlyoutTargetControl, new FlyoutShowOptions() { Placement = FlyoutPlacementMode.Top });
+
+			IsOpen = true;
 		}
 
 		public void Hide()
 		{
-			_menuFlyout?.Hide();
 			_host?.UpdateWindowVisibility(false);
+
+			_menuFlyout?.Hide();
+
+			IsOpen = false;
 		}
 
 		private void UpdateFlyoutTheme()
 		{
+			if (GeneralHelpers.IsTaskbarLight())
+			{
+				RequestedTheme = ElementTheme.Light;
+			}
+			else
+			{
+				RequestedTheme = ElementTheme.Dark;
+			}
 		}
 	}
 }

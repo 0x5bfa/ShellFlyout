@@ -5,7 +5,7 @@ using Microsoft.Win32;
 
 namespace U5BFA.ShellFlyout
 {
-	internal static class RegistryHelpers
+	internal static class GeneralHelpers
 	{
 		internal static bool IsTaskbarLight()
 		{

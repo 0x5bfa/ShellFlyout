@@ -2,7 +2,6 @@
 // Licensed under the MIT license.
 
 using Microsoft.UI.Xaml;
-using ShellFlyout.Wasdk;
 using System;
 
 namespace U5BFA.ShellFlyout
@@ -34,29 +33,33 @@ namespace U5BFA.ShellFlyout
 				Id = new Guid("28DE460A-8BD6-4539-A406-5F685584FD4D")
 			};
 
-			_trayIconFlyout = new MainShellFlyout();
-			_trayIconMenuFlyout = new(new MainTrayIconMeunFlyout());
+			_trayIconFlyout = new MainTrayIconFlyout();
+			_trayIconMenuFlyout = new MainTrayIconMeunFlyout();
 
 			_systemTrayIcon.Show();
 			_systemTrayIcon.LeftClicked += SystemTrayIcon_LeftClicked;
 			_systemTrayIcon.RightClicked += SystemTrayIcon_RightClicked;
 		}
 
-		private async void SystemTrayIcon_LeftClicked(object? sender, EventArgs e)
+		private void SystemTrayIcon_LeftClicked(object? sender, EventArgs e)
 		{
+
 			if (_trayIconFlyout is null)
 				return;
 
 			if (_trayIconFlyout.IsOpen)
-				await _trayIconFlyout.CloseFlyoutAsync();
+				_trayIconFlyout.Hide();
 			else
-				await _trayIconFlyout.OpenFlyoutAsync();
+				_trayIconFlyout.Show();
 		}
 
 		private void SystemTrayIcon_RightClicked(object? sender, EventArgs e)
 		{
 			if (_trayIconMenuFlyout is null)
 				return;
+
+			if (_trayIconMenuFlyout.IsOpen)
+				_trayIconMenuFlyout.Hide();
 
 			_trayIconMenuFlyout.Show();
 		}

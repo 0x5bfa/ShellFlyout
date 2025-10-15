@@ -64,7 +64,7 @@ namespace U5BFA.ShellFlyout
 
 		internal void UpdateBackdrop(bool isEnabled, bool coerce = false)
 		{
-			if (_owner is null || !_owner.TryGetTarget(out var owner))
+			if (_owner is null || !_owner.TryGetTarget(out var owner) || owner.BackdropManager is null)
 				return;
 
 			if (isEnabled)
@@ -76,7 +76,7 @@ namespace U5BFA.ShellFlyout
 						if (_backdropLink is null)
 							return;
 
-						owner.DiscardBackdropLink(_backdropLink);
+						owner.BackdropManager.RemoveLink(_backdropLink);
 						_backdropLink = null;
 						_isBackdropLinkAttached = false;
 					}
@@ -86,7 +86,7 @@ namespace U5BFA.ShellFlyout
 					}
 				}
 
-				_backdropLink = owner.CreateBackdropLink();
+				_backdropLink = owner.BackdropManager.CreateLink();
 				_isBackdropLinkAttached = true;
 				UpdateBackdropVisual();
 			}
@@ -95,7 +95,7 @@ namespace U5BFA.ShellFlyout
 				if (_backdropLink is null)
 					return;
 
-				owner.DiscardBackdropLink(_backdropLink);
+				owner.BackdropManager.RemoveLink(_backdropLink);
 				_backdropLink = null;
 				_isBackdropLinkAttached = false;
 			}

@@ -50,6 +50,15 @@ namespace U5BFA.ShellFlyout
 			}
 		}
 
+		internal double XamlIslandRasterizationScale
+		{
+			[MethodImpl(MethodImplOptions.AggressiveInlining)]
+			get
+			{
+				return DesktopWindowXamlSource?.SiteBridge.SiteView.RasterizationScale ?? 1.0D;
+			}
+		}
+
 		internal event EventHandler? WindowInactivated;
 
 		internal XamlIslandHostWindow()

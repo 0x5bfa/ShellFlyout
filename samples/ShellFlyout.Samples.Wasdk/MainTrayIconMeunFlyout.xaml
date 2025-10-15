@@ -1,4 +1,4 @@
-<MenuFlyout
+<local:TrayIconMenuFlyout
 	x:Class="U5BFA.ShellFlyout.MainTrayIconMeunFlyout"
 	xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
 	xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
@@ -6,6 +6,7 @@
 	xmlns:local="using:U5BFA.ShellFlyout"
 	xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
 	mc:Ignorable="d">
+
 	<MenuFlyoutSubItem Text="A">
 		<MenuFlyoutItem Text="A" />
 		<MenuFlyoutItem Text="A" />
@@ -13,4 +14,5 @@
 	</MenuFlyoutSubItem>
 	<MenuFlyoutItem Text="A" />
 	<MenuFlyoutItem Text="A" />
-</MenuFlyout>
+
+</local:TrayIconMenuFlyout>

@@ -5,7 +5,7 @@ using Microsoft.UI.Xaml.Controls;
 
 namespace U5BFA.ShellFlyout
 {
-	public sealed partial class MainTrayIconMeunFlyout : MenuFlyout
+	public sealed partial class MainTrayIconMeunFlyout : TrayIconMenuFlyout
 	{
 		public MainTrayIconMeunFlyout()
 		{

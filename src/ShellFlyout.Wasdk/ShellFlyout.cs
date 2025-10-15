@@ -5,24 +5,29 @@ using Microsoft.UI.Content;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Hosting;
+using Microsoft.UI.Xaml.Markup;
+using Microsoft.UI.Xaml.Media.Animation;
 using System;
 using System.Diagnostics;
 using System.Threading.Tasks;
 
 namespace U5BFA.ShellFlyout
 {
+	[ContentProperty(Name = nameof(Islands))]
 	public partial class ShellFlyout : Control, IDisposable
 	{
 		private const string PART_RootGrid = "PART_RootGrid";
 		private const string PART_IslandsGrid = "PART_IslandsGrid";
 
 		private readonly XamlIslandHostWindow? _host;
-		private ContentBackdropManager? _backdropManager;
-		private bool _wasTaskbarDark;
-		private bool _wasTaskbarColorPrevalence;
+		private bool? _wasTaskbarLightLastTimeChecked;
+		private bool? _wasTaskbarColorPrevalenceLastTimeChecked;
+		private bool _isPopupAnimationPlaying;
 
 		private Grid? RootGrid;
 		private Grid? IslandsGrid;
+
+		internal ContentBackdropManager? BackdropManager { get; private set; }
 
 		public bool IsOpen { get; private set; }
 
@@ -47,93 +52,94 @@ namespace U5BFA.ShellFlyout
 			IslandsGrid = GetTemplateChild(PART_IslandsGrid) as Grid
 				?? throw new MissingFieldException($"Could not find {PART_IslandsGrid} in the given {nameof(ShellFlyout)}'s style.");
 
-			Unloaded += ShellFlyout_Unloaded;
-
 			UpdateIslands();
 		}
 
-		public async Task OpenFlyoutAsync()
+		public void Show()
 		{
-			if (_host?.DesktopWindowXamlSource is null)
+			if (_host?.DesktopWindowXamlSource is null || RootGrid is null || _isPopupAnimationPlaying)
 				return;
 
+			_isPopupAnimationPlaying = true;
+
 			_host.Maximize();
-			UpdateFlyoutRegion();
-			UpdateFlyoutTheme();
-			UpdateBackdropManager();
 
 			UpdateLayout();
-			await Task.Delay(1);
 
-			_host.UpdateWindowVisibility(true);
+			_ = Task.Run(async () =>
+			{
+				await Task.Delay(1);
+				RootGrid.DispatcherQueue.TryEnqueue(() =>
+				{
+					UpdateFlyoutTheme();
+					UpdateBackdropManager();
+					UpdateFlyoutRegion();
+					_host.UpdateWindowVisibility(true);
 
-			if (IsTransitionAnimationEnabled && RootGrid is not null)
+					if (IsTransitionAnimationEnabled)
+					{
+						var storyboard = PopupDirection is Orientation.Vertical
+							? TransitionHelpers.GetWindows11BottomToTopTransitionStoryboard(RootGrid, (int)DesiredSize.Height, 0)
+							: TransitionHelpers.GetWindows11RightToLeftTransitionStoryboard(RootGrid, (int)DesiredSize.Width, 0);
+						storyboard.Begin();
+						storyboard.Completed += OpenAnimationStoryboard_Completed;
+					}
+				});
+			});
+		}
+
+		public void Hide()
+		{
+			if (RootGrid is null || _isPopupAnimationPlaying)
+				return;
+
+			_isPopupAnimationPlaying = true;
+
+			if (IsTransitionAnimationEnabled)
 			{
 				var storyboard = PopupDirection is Orientation.Vertical
-					? TransitionHelpers.GetWindows11BottomToTopTransitionStoryboard(RootGrid, (int)ActualHeight, 0)
-					: TransitionHelpers.GetWindows11RightToLeftTransitionStoryboard(RootGrid, (int)ActualWidth, 0);
+					? TransitionHelpers.GetWindows11TopToBottomTransitionStoryboard(RootGrid, 0, (int)DesiredSize.Height)
+					: TransitionHelpers.GetWindows11LeftToRightTransitionStoryboard(RootGrid, 0, (int)DesiredSize.Width);
 				storyboard.Begin();
-				await Task.Delay(200);
+				storyboard.Completed += CloseAnimationStoryboard_Completed;
 			}
-
-			IsOpen = true;
-		}
-
-		public async Task CloseFlyoutAsync()
-		{
-			if (IsTransitionAnimationEnabled && RootGrid is not null)
-			{
-				var storyboard = PopupDirection is Orientation.Vertical
-					? TransitionHelpers.GetWindows11TopToBottomTransitionStoryboard(RootGrid, 0, (int)ActualHeight)
-					: TransitionHelpers.GetWindows11LeftToRightTransitionStoryboard(RootGrid, 0, (int)ActualWidth);
-				storyboard.Begin();
-				await Task.Delay(200);
-			}
-
-			_host?.UpdateWindowVisibility(false);
-
-			IsOpen = false;
-		}
-
-		internal ContentExternalBackdropLink? CreateBackdropLink()
-		{
-			return _backdropManager?.CreateLink();
-		}
-
-		internal void DiscardBackdropLink(ContentExternalBackdropLink backdropLink)
-		{
-			_backdropManager?.RemoveLink(backdropLink);
 		}
 
 		private void UpdateBackdropManager()
 		{
-			var _isTaskbarDark = RegistryHelpers.IsTaskbarLight();
-			var _isTaskbarColorPrevalence = RegistryHelpers.IsTaskbarColorPrevalenceEnabled();
-			bool shouldUpdateBackdrop = _wasTaskbarDark != _isTaskbarDark || _wasTaskbarColorPrevalence != _isTaskbarColorPrevalence;
-			_wasTaskbarDark = _isTaskbarDark;
-			_wasTaskbarColorPrevalence = _isTaskbarColorPrevalence;
+			var isTaskbarLight = GeneralHelpers.IsTaskbarLight();
+			var isTaskbarColorPrevalence = GeneralHelpers.IsTaskbarColorPrevalenceEnabled();
+			bool shouldUpdateBackdrop = _wasTaskbarLightLastTimeChecked != isTaskbarLight || _wasTaskbarColorPrevalenceLastTimeChecked != isTaskbarColorPrevalence;
+			_wasTaskbarLightLastTimeChecked = isTaskbarLight;
+			_wasTaskbarColorPrevalenceLastTimeChecked = isTaskbarColorPrevalence;
 			if (!shouldUpdateBackdrop)
 				return;
 
 			var controller = BackdropController
-				?? (_isTaskbarColorPrevalence
+				?? (isTaskbarColorPrevalence
 					? BackdropControllerHelpers.GetAccentedAcrylicController(Resources)
-					: _isTaskbarDark
+					: isTaskbarLight
 						? BackdropControllerHelpers.GetLightAcrylicController(Resources)
 						: BackdropControllerHelpers.GetDarkAcrylicController(Resources));
 			if (controller is null)
 				return;
 
-			_backdropManager?.Dispose();
-			_backdropManager = null;
-			_backdropManager = ContentBackdropManager.Create(controller, ElementCompositionPreview.GetElementVisual(IslandsGrid).Compositor, ActualTheme);
+			BackdropManager?.Dispose();
+			BackdropManager = null;
+			BackdropManager = ContentBackdropManager.Create(controller, ElementCompositionPreview.GetElementVisual(IslandsGrid).Compositor, ActualTheme);
 
 			UpdateBackdrop(true);
 		}
 
+		private void UpdateBackdrop(bool coerce = false)
+		{
+			foreach (var island in Islands)
+				island.UpdateBackdrop(IsBackdropEnabled, coerce);
+		}
+
 		private void UpdateFlyoutTheme()
 		{
-			if (RegistryHelpers.IsTaskbarLight())
+			if (GeneralHelpers.IsTaskbarLight())
 			{
 				foreach (var island in Islands)
 					island.RequestedTheme = ElementTheme.Light;
@@ -185,21 +191,13 @@ namespace U5BFA.ShellFlyout
 			}
 		}
 
-		private void UpdateBackdrop(bool coerce = false)
-		{
-			foreach (var island in Islands)
-			{
-				island.UpdateBackdrop(IsBackdropEnabled, coerce);
-			}
-		}
-
 		private void UpdateFlyoutRegion()
 		{
 			if (_host?.DesktopWindowXamlSource is null || IslandsGrid is null)
 				return;
 
-			var flyoutWidth = (IslandsGrid.ActualWidth + Margin.Left + Margin.Right) * RasterizationScale;
-			var flyoutHeight = (IslandsGrid.ActualHeight + Margin.Top + Margin.Bottom) * RasterizationScale;
+			var flyoutWidth = DesiredSize.Width * _host.XamlIslandRasterizationScale;
+			var flyoutHeight = DesiredSize.Height * _host.XamlIslandRasterizationScale;
 
 			_host?.SetHWndRectRegion(new(
 				(int)(_host.WindowSize.Width - flyoutWidth),
@@ -208,21 +206,35 @@ namespace U5BFA.ShellFlyout
 				(int)_host.WindowSize.Height));
 		}
 
-		private void ShellFlyout_Unloaded(object sender, RoutedEventArgs e)
+		private void OpenAnimationStoryboard_Completed(object? sender, object e)
 		{
-			Unloaded -= ShellFlyout_Unloaded;
+			if (sender is not Storyboard storyboard)
+				return;
+
+			storyboard.Completed -= OpenAnimationStoryboard_Completed;
+			_isPopupAnimationPlaying = false;
+			IsOpen = true;
 		}
 
-		private async void HostWindow_Inactivated(object? sender, EventArgs e)
+		private void CloseAnimationStoryboard_Completed(object? sender, object e)
 		{
-			Debug.WriteLine("HostWindow_Inactivated");
+			if (sender is not Storyboard storyboard)
+				return;
 
-			//await CloseFlyoutAsync();
+			storyboard.Completed -= CloseAnimationStoryboard_Completed;
+			_isPopupAnimationPlaying = false;
+			IsOpen = false;
+			_host?.UpdateWindowVisibility(false);
+		}
+
+		private void HostWindow_Inactivated(object? sender, EventArgs e)
+		{
+			Hide();
 		}
 
 		public void Dispose()
 		{
-			_backdropManager?.Dispose();
+			BackdropManager?.Dispose();
 			_host?.WindowInactivated -= HostWindow_Inactivated;
 			_host?.Dispose();
 		}

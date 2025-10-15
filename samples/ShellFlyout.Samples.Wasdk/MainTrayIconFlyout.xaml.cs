@@ -3,9 +3,9 @@
 
 namespace U5BFA.ShellFlyout
 {
-	public sealed partial class MainShellFlyout : ShellFlyout
+	public sealed partial class MainTrayIconFlyout : ShellFlyout
 	{
-		public MainShellFlyout()
+		public MainTrayIconFlyout()
 		{
 			InitializeComponent();
 		}
