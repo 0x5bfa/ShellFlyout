@@ -1,8 +1,6 @@
 ﻿// Copyright (c) 0x5BFA. All rights reserved.
 // Licensed under the MIT license.
 
-using CommunityToolkit.Helpers;
-using CommunityToolkit.WinUI;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Controls.Primitives;

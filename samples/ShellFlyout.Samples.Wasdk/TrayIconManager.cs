@@ -8,12 +8,12 @@ namespace U5BFA.ShellFlyout
 	internal partial class TrayIconManager : IDisposable
 	{
 		private static readonly Lazy<TrayIconManager> _default = new(() => new TrayIconManager());
-		public static TrayIconManager Default => _default.Value;
+		internal static TrayIconManager Default => _default.Value;
 
-		private static SystemTrayIcon? _systemTrayIcon;
-		private static ContentBackdropManager? _backdropManager;
-		private static ShellFlyout? _trayIconFlyout;
-		private static TrayIconMenuFlyout? _trayIconMenuFlyout;
+		private SystemTrayIcon? _systemTrayIcon;
+		private TrayIconMenuFlyout? _trayIconMenuFlyout;
+
+		internal ShellFlyout? TrayIconFlyout { get; set; }
 
 		private TrayIconManager() { }
 
@@ -26,7 +26,7 @@ namespace U5BFA.ShellFlyout
 				Id = new Guid("28DE460A-8BD6-4539-A406-5F685584FD4D")
 			};
 
-			_trayIconFlyout = new MainTrayIconFlyout();
+			TrayIconFlyout = new MainTrayIconFlyout();
 			_trayIconMenuFlyout = new MainTrayIconMeunFlyout();
 
 			_systemTrayIcon.Show();
@@ -36,13 +36,13 @@ namespace U5BFA.ShellFlyout
 
 		private void SystemTrayIcon_LeftClicked(object? sender, EventArgs e)
 		{
-			if (_trayIconFlyout is null)
+			if (TrayIconFlyout is null)
 				return;
 
-			if (_trayIconFlyout.IsOpen)
-				_trayIconFlyout.Hide();
+			if (TrayIconFlyout.IsOpen)
+				TrayIconFlyout.Hide();
 			else
-				_trayIconFlyout.Show();
+				TrayIconFlyout.Show();
 		}
 
 		private void SystemTrayIcon_RightClicked(object? sender, EventArgs e)
@@ -61,8 +61,7 @@ namespace U5BFA.ShellFlyout
 			_systemTrayIcon?.LeftClicked -= SystemTrayIcon_LeftClicked;
 			_systemTrayIcon?.RightClicked -= SystemTrayIcon_RightClicked;
 			_systemTrayIcon?.Destroy();
-			_trayIconFlyout?.Dispose();
-			_backdropManager?.Dispose();
+			TrayIconFlyout?.Dispose();
 		}
 	}
 }

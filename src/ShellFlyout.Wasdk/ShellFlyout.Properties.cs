@@ -37,6 +37,9 @@ namespace U5BFA.ShellFlyout
 		[GeneratedDependencyProperty(DefaultValue = true)]
 		public partial bool IsTransitionAnimationEnabled { get; set; }
 
+		[GeneratedDependencyProperty(DefaultValue = true)]
+		public partial bool HideOnLostFocus { get; set; }
+
 		[GeneratedDependencyProperty]
 		public partial ISystemBackdropControllerWithTargets? BackdropController { get; set; }
 

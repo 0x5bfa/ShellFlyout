@@ -1,14 +1,12 @@
 ﻿// Copyright (c) 0x5BFA. All rights reserved.
 // Licensed under the MIT license.
 
-using Microsoft.UI.Content;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Hosting;
 using Microsoft.UI.Xaml.Markup;
 using Microsoft.UI.Xaml.Media.Animation;
 using System;
-using System.Diagnostics;
 using System.Threading.Tasks;
 
 namespace U5BFA.ShellFlyout
@@ -229,7 +227,7 @@ namespace U5BFA.ShellFlyout
 
 		private void HostWindow_Inactivated(object? sender, EventArgs e)
 		{
-			Hide();
+			if (HideOnLostFocus) Hide();
 		}
 
 		public void Dispose()
