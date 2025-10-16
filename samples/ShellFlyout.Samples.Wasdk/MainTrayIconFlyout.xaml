@@ -6,7 +6,6 @@
 	xmlns:local="using:U5BFA.ShellFlyout"
 	xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
 	Width="360"
-	PopupDirection="Horizontal"
 	mc:Ignorable="d">
 
 	<local:ShellFlyoutIsland Height="300">

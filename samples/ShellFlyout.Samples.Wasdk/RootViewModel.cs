@@ -23,8 +23,12 @@ namespace U5BFA.ShellFlyout
 		[ObservableProperty]
 		internal partial int SelectedFlyoutPlacementIndex { get; set; }
 
+		[ObservableProperty]
+		internal partial int SelectedBackdropIndex { get; set; }
+
 		public Dictionary<Orientation, string> PopupDirections { get; private set; } = [];
 		public Dictionary<FlyoutPlacementMode, string> FlyoutPlacements { get; private set; } = [];
+		public Dictionary<BackdropKind, string> Backdrops { get; private set; } = [];
 
 		internal RootViewModel()
 		{
@@ -40,6 +44,10 @@ namespace U5BFA.ShellFlyout
 			FlyoutPlacements.Add(FlyoutPlacementMode.BottomEdgeAlignedLeft, "Bottom left");
 			FlyoutPlacements.Add(FlyoutPlacementMode.BottomEdgeAlignedRight, "Bottom right");
 			SelectedFlyoutPlacementIndex = 3;
+
+			Backdrops.Add(BackdropKind.Acrylic, "Acrylic");
+			Backdrops.Add(BackdropKind.Mica, "Mica");
+			SelectedBackdropIndex = 0;
 		}
 
 		partial void OnIsBackdropEnabledChanged(bool value)
@@ -60,6 +68,11 @@ namespace U5BFA.ShellFlyout
 		partial void OnSelectedFlyoutPlacementIndexChanged(int value)
 		{
 			TrayIconManager.Default.TrayIconFlyout?.Placement = FlyoutPlacements.ElementAt(value).Key;
+		}
+
+		partial void OnSelectedBackdropIndexChanged(int value)
+		{
+			TrayIconManager.Default.TrayIconFlyout?.BackdropKind = Backdrops.ElementAt(value).Key;
 		}
 	}
 }

@@ -40,8 +40,8 @@ namespace U5BFA.ShellFlyout
 		[GeneratedDependencyProperty(DefaultValue = true)]
 		public partial bool HideOnLostFocus { get; set; }
 
-		[GeneratedDependencyProperty]
-		public partial ISystemBackdropControllerWithTargets? BackdropController { get; set; }
+		[GeneratedDependencyProperty(DefaultValue = BackdropKind.Acrylic)]
+		public partial BackdropKind BackdropKind { get; set; }
 
 		partial void OnIslandsSourcePropertyChanged(DependencyPropertyChangedEventArgs e)
 		{
@@ -51,9 +51,7 @@ namespace U5BFA.ShellFlyout
 			Islands.Clear();
 
 			foreach (var island in newIslands)
-			{
 				Islands.Add(island);
-			}
 
 			UpdateIslands();
 		}
@@ -63,15 +61,15 @@ namespace U5BFA.ShellFlyout
 			if ((bool)e.NewValue == (bool)e.OldValue)
 				return;
 
-			UpdateBackdrop();
+			UpdateBackdropManager(true);
 		}
 
-		partial void OnBackdropControllerPropertyChanged(DependencyPropertyChangedEventArgs e)
+		partial void OnBackdropKindPropertyChanged(DependencyPropertyChangedEventArgs e)
 		{
-			if (e.NewValue == e.OldValue)
+			if ((BackdropKind)e.NewValue == (BackdropKind)e.OldValue)
 				return;
 
-			UpdateBackdropManager();
+			UpdateBackdropManager(true);
 		}
 	}
 }

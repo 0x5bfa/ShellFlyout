@@ -1,6 +1,7 @@
 ﻿// Copyright (c) 0x5BFA. All rights reserved.
 // Licensed under the MIT license.
 
+using Microsoft.UI.Composition.SystemBackdrops;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Hosting;
@@ -103,22 +104,27 @@ namespace U5BFA.ShellFlyout
 			}
 		}
 
-		private void UpdateBackdropManager()
+		private void UpdateBackdropManager(bool coerce = false)
 		{
 			var isTaskbarLight = GeneralHelpers.IsTaskbarLight();
 			var isTaskbarColorPrevalence = GeneralHelpers.IsTaskbarColorPrevalenceEnabled();
 			bool shouldUpdateBackdrop = _wasTaskbarLightLastTimeChecked != isTaskbarLight || _wasTaskbarColorPrevalenceLastTimeChecked != isTaskbarColorPrevalence;
 			_wasTaskbarLightLastTimeChecked = isTaskbarLight;
 			_wasTaskbarColorPrevalenceLastTimeChecked = isTaskbarColorPrevalence;
-			if (!shouldUpdateBackdrop)
+			if (!shouldUpdateBackdrop && !coerce)
 				return;
 
-			var controller = BackdropController
-				?? (isTaskbarColorPrevalence
+			ISystemBackdropControllerWithTargets? controller = BackdropKind is BackdropKind.Acrylic
+				? (isTaskbarColorPrevalence
 					? BackdropControllerHelpers.GetAccentedAcrylicController(Resources)
 					: isTaskbarLight
 						? BackdropControllerHelpers.GetLightAcrylicController(Resources)
-						: BackdropControllerHelpers.GetDarkAcrylicController(Resources));
+						: BackdropControllerHelpers.GetDarkAcrylicController(Resources))
+				: (isTaskbarColorPrevalence
+					? BackdropControllerHelpers.GetAccentedMicaController(Resources)
+					: isTaskbarLight
+						? BackdropControllerHelpers.GetLightMicaController(Resources)
+						: BackdropControllerHelpers.GetDarkMicaController(Resources));
 			if (controller is null)
 				return;
 

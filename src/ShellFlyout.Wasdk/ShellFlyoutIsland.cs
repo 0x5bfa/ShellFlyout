@@ -15,8 +15,6 @@ namespace U5BFA.ShellFlyout
 		private const string PART_BackdropTargetGrid = "PART_BackdropTargetGrid";
 		private const string PART_MainContentPresenter = "PART_MainContentPresenter";
 
-		private readonly XamlIslandHostWindow? _host;
-
 		private WeakReference<ShellFlyout>? _owner;
 		private ContentExternalBackdropLink? _backdropLink;
 		private bool _isBackdropLinkAttached;
@@ -117,24 +115,8 @@ namespace U5BFA.ShellFlyout
 			ElementCompositionPreview.SetElementChildVisual(BackdropTargetGrid, _backdropLink.PlacementVisual);
 		}
 
-		private void UpdateFlyoutRegion()
-		{
-			if (_host?.DesktopWindowXamlSource is null)
-				return;
-
-			var flyoutWidth = (((FrameworkElement)Content).Width + Margin.Left + Margin.Right) * RasterizationScale;
-			var flyoutHeight = (((FrameworkElement)Content).Height + Margin.Top + Margin.Bottom) * RasterizationScale;
-
-			_host?.SetHWndRectRegion(new(
-				(int)(_host.WindowSize.Width - flyoutWidth),
-				(int)(_host.WindowSize.Height - flyoutHeight),
-				(int)_host.WindowSize.Width,
-				(int)_host.WindowSize.Height));
-		}
-
 		private void Content_SizeChanged(object sender, SizeChangedEventArgs e)
 		{
-			UpdateFlyoutRegion();
 			UpdateBackdropVisual();
 		}
 	}

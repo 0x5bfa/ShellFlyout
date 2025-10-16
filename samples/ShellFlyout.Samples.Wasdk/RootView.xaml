@@ -30,6 +30,9 @@
 				<wctcontrols:SettingsCard Header="Hide on losing focus">
 					<ToggleSwitch IsOn="{x:Bind ViewModel.HideOnLostFocus, Mode=TwoWay}" />
 				</wctcontrols:SettingsCard>
+				<wctcontrols:SettingsCard Header="Backdrop kind">
+					<ComboBox ItemsSource="{x:Bind ViewModel.Backdrops.Values}" SelectedIndex="{x:Bind ViewModel.SelectedBackdropIndex, Mode=TwoWay}" />
+				</wctcontrols:SettingsCard>
 			</StackPanel>
 		</StackPanel>
 	</ScrollViewer>
