@@ -1,0 +1,45 @@
+<Solution>
+
+  <Configurations>
+    <Platform Name="ARM64" />
+    <Platform Name="x64" />
+    <Platform Name="x86" />
+  </Configurations>
+
+  <Folder Name="/global/">
+    <File Path=".github/workflows/cd.yml" />
+    <File Path=".github/workflows/ci.yml" />
+    <File Path="nuget.config" />
+    <File Path="README.md" />
+  </Folder>
+
+  <Folder Name="/samples/">
+    <Project Path="samples/TrayIconFlyout.Samples.Uwp/TrayIconFlyout.Samples.Uwp.csproj">
+      <Platform Solution="*|ARM64" Project="arm64" />
+      <Platform Solution="*|x64" Project="x64" />
+      <Platform Solution="*|x86" Project="x86" />
+      <Deploy />
+    </Project>
+    <Project Path="samples/TrayIconFlyout.Samples.Wasdk/TrayIconFlyout.Samples.Wasdk.csproj">
+      <Platform Solution="*|ARM64" Project="ARM64" />
+      <Platform Solution="*|x64" Project="x64" />
+      <Platform Solution="*|x86" Project="x86" />
+      <Deploy />
+    </Project>
+  </Folder>
+
+  <Folder Name="/src/">
+    <Project Path="src/TrayIconFlyout.Shared/TrayIconFlyout.Shared.shproj" Id="97b61227-b152-453d-a2d1-f7a98fc83367" />
+    <Project Path="src/TrayIconFlyout.Uwp/TrayIconFlyout.Uwp.csproj" Id="d3ef520c-8296-4e85-aaec-0b184e2be188">
+      <Platform Solution="*|ARM64" Project="ARM64" />
+      <Platform Solution="*|x64" Project="x64" />
+      <Platform Solution="*|x86" Project="x86" />
+    </Project>
+    <Project Path="src/TrayIconFlyout.Wasdk/TrayIconFlyout.Wasdk.csproj">
+      <Platform Solution="*|ARM64" Project="ARM64" />
+      <Platform Solution="*|x64" Project="x64" />
+      <Platform Solution="*|x86" Project="x86" />
+    </Project>
+  </Folder>
+
+</Solution>

@@ -1,15 +1,15 @@
 # Copyright (c) 0x5BFA. All rights reserved.
 # Licensed under the MIT license.
 
-name: ShellFlyout CD
+name: TrayIconFlyout CD
 
 on:
   workflow_dispatch:
 
 env:
-  WORKING_DIR:         '${{ github.workspace }}' # 'D:\a\ShellFlyout\ShellFlyout'
-  SOLUTION_PATH:       '${{ github.workspace }}\ShellFlyout.slnx'
-  WASDK_CSPROJ_PATH:   '${{ github.workspace }}\ShellFlyout.Wasdk\ShellFlyout.Wasdk.csproj'
+  WORKING_DIR:         '${{ github.workspace }}' # 'D:\a\TrayIconFlyout\TrayIconFlyout'
+  SOLUTION_PATH:       '${{ github.workspace }}\TrayIconFlyout.slnx'
+  WASDK_CSPROJ_PATH:   '${{ github.workspace }}\TrayIconFlyout.Wasdk\TrayIconFlyout.Wasdk.csproj'
 
 jobs:
 

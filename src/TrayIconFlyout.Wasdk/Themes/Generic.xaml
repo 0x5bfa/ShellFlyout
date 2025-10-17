@@ -1,0 +1,16 @@
+<!--  Copyright (c) Files Community. Licensed under the MIT License.  -->
+<ResourceDictionary
+	xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+	xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+	xmlns:local="using:U5BFA.TrayIconFlyout">
+
+	<ResourceDictionary.MergedDictionaries>
+		<XamlControlsResources xmlns="using:Microsoft.UI.Xaml.Controls" />
+
+		<!--#region TrayIconFlyout-->
+		<ResourceDictionary Source="ms-appx:///TrayIconFlyout.Wasdk/TrayIconFlyout.xaml" />
+		<!--#endregion-->
+
+	</ResourceDictionary.MergedDictionaries>
+
+</ResourceDictionary>

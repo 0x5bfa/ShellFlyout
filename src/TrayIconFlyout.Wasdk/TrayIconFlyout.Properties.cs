@@ -1,0 +1,75 @@
+﻿// Copyright (c) 0x5BFA. All rights reserved.
+// Licensed under the MIT license.
+
+using CommunityToolkit.WinUI;
+using Microsoft.UI.Composition.SystemBackdrops;
+using Microsoft.UI.Xaml;
+using Microsoft.UI.Xaml.Controls;
+using Microsoft.UI.Xaml.Controls.Primitives;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+
+namespace U5BFA.TrayIconFlyout
+{
+	public partial class TrayIconFlyout
+	{
+		private readonly ObservableCollection<TrayIconFlyoutIsland> _islands = [];
+		public IList<TrayIconFlyoutIsland> Islands => _islands;
+
+		[GeneratedDependencyProperty]
+		public partial object? IslandsSource { get; set; }
+
+		[GeneratedDependencyProperty(DefaultValue = true)]
+		public partial bool IsBackdropEnabled { get; set; }
+
+		[GeneratedDependencyProperty(DefaultValue = Orientation.Vertical)]
+		public partial Orientation PopupDirection { get; set; }
+
+		[GeneratedDependencyProperty(DefaultValue = Orientation.Vertical)]
+		public partial Orientation IslandsOrientation { get; set; }
+
+		[GeneratedDependencyProperty(DefaultValue = FlyoutPlacementMode.BottomEdgeAlignedRight)]
+		public partial FlyoutPlacementMode Placement { get; set; }
+
+		[GeneratedDependencyProperty]
+		public partial MenuFlyout? MenuFlyout { get; set; }
+
+		[GeneratedDependencyProperty(DefaultValue = true)]
+		public partial bool IsTransitionAnimationEnabled { get; set; }
+
+		[GeneratedDependencyProperty(DefaultValue = true)]
+		public partial bool HideOnLostFocus { get; set; }
+
+		[GeneratedDependencyProperty(DefaultValue = BackdropKind.Acrylic)]
+		public partial BackdropKind BackdropKind { get; set; }
+
+		partial void OnIslandsSourcePropertyChanged(DependencyPropertyChangedEventArgs e)
+		{
+			if (e.NewValue is not IEnumerable<TrayIconFlyoutIsland> newIslands)
+				return;
+
+			Islands.Clear();
+
+			foreach (var island in newIslands)
+				Islands.Add(island);
+
+			UpdateIslands();
+		}
+
+		partial void OnIsBackdropEnabledPropertyChanged(DependencyPropertyChangedEventArgs e)
+		{
+			if ((bool)e.NewValue == (bool)e.OldValue)
+				return;
+
+			UpdateBackdropManager(true);
+		}
+
+		partial void OnBackdropKindPropertyChanged(DependencyPropertyChangedEventArgs e)
+		{
+			if ((BackdropKind)e.NewValue == (BackdropKind)e.OldValue)
+				return;
+
+			UpdateBackdropManager(true);
+		}
+	}
+}

@@ -1,0 +1,12 @@
+{
+	"profiles": {
+		"TrayIconFlyout.Samples.Wasdk (Package)": {
+			"commandName": "MsixPackage",
+			"nativeDebugging": true
+		},
+		"TrayIconFlyout.Samples.Wasdk (Unpackaged)": {
+			"commandName": "Project",
+			"nativeDebugging": true
+		}
+	}
+}

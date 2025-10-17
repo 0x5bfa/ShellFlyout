@@ -1,5 +1,5 @@
-<h1 align="center">Shell Flyout</h1>
-<p align="center">Empower your app with a shell flyout that pops up from a tray icon.</p>
+<h1 align="center">Tray Icon Flyout</h1>
+<p align="center">Empower your app with a Shell Flyout-like that pops up from a tray icon.</p>
 
 ## Building from the source
 
@@ -9,7 +9,7 @@
     - .NET 9 SDK
 2. Clone the repo
     ```console
-    git clone https://github.com/0x5bfa/ShellFlyout.git
+    git clone https://github.com/0x5bfa/TrayIconFlyout.git
     ```
 3. Open the solution
 4. Build the solution

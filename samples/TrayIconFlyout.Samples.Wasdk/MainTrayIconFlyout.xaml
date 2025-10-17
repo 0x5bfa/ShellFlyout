@@ -1,0 +1,38 @@
+<local:TrayIconFlyout
+	x:Class="U5BFA.TrayIconFlyout.MainTrayIconFlyout"
+	xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+	xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+	xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+	xmlns:local="using:U5BFA.TrayIconFlyout"
+	xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+	Width="360"
+	mc:Ignorable="d">
+
+	<local:TrayIconFlyoutIsland Height="300">
+		<Button
+			HorizontalAlignment="Center"
+			VerticalAlignment="Center"
+			Content="Button">
+			<Button.Flyout>
+				<MenuFlyout>
+					<MenuFlyoutItem Text="A" />
+					<MenuFlyoutItem Text="A" />
+					<MenuFlyoutItem Text="A" />
+				</MenuFlyout>
+			</Button.Flyout>
+		</Button>
+	</local:TrayIconFlyoutIsland>
+	<local:TrayIconFlyoutIsland Height="300">
+		<TextBlock
+			HorizontalAlignment="Center"
+			VerticalAlignment="Center"
+			Text="Island 2" />
+	</local:TrayIconFlyoutIsland>
+	<local:TrayIconFlyoutIsland Height="300">
+		<TextBlock
+			HorizontalAlignment="Center"
+			VerticalAlignment="Center"
+			Text="Island 3" />
+	</local:TrayIconFlyoutIsland>
+
+</local:TrayIconFlyout>

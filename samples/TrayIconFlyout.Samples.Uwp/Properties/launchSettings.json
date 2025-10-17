@@ -1,0 +1,12 @@
+{
+	"profiles": {
+		"TrayIconFlyout.Samples.Uwp (Packaged)": {
+			"commandName": "MsixPackage",
+			"nativeDebugging": true
+		},
+		"TrayIconFlyout.Samples.Uwp (Unpackaged)": {
+			"commandName": "Project",
+			"nativeDebugging": true
+		}
+	}
+}

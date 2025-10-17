@@ -1,0 +1,108 @@
+<ResourceDictionary
+	xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+	xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+	xmlns:animatedvisuals="using:Microsoft.UI.Xaml.Controls.AnimatedVisuals"
+	xmlns:local="using:U5BFA.TrayIconFlyout"
+	xmlns:systembackdrops="using:Microsoft.UI.Composition.SystemBackdrops">
+
+	<Style BasedOn="{StaticResource DefaultWindows11TrayIconFlyoutStyle}" TargetType="local:TrayIconFlyout" />
+	<Style BasedOn="{StaticResource DefaultTrayIconFlyoutIslandStyle}" TargetType="local:TrayIconFlyoutIsland" />
+
+	<Style BasedOn="{StaticResource DefaultWindows11TrayIconMenuFlyoutStyle}" TargetType="local:TrayIconMenuFlyout" />
+
+	<Style x:Key="DefaultWindows11TrayIconFlyoutStyle" TargetType="local:TrayIconFlyout">
+		<Setter Property="HorizontalAlignment" Value="Right" />
+		<Setter Property="VerticalAlignment" Value="Bottom" />
+		<Setter Property="Margin" Value="12" />
+		<Setter Property="BorderThickness" Value="0" />
+		<Setter Property="BorderBrush" Value="{ThemeResource CardStrokeColorDefaultBrush}" />
+		<Setter Property="AutomationProperties.LandmarkType" Value="Navigation" />
+		<Setter Property="IsTabStop" Value="False" />
+		<Setter Property="Template">
+			<Setter.Value>
+				<ControlTemplate TargetType="local:TrayIconFlyout">
+					<Grid
+						x:Name="PART_RootGrid"
+						BorderBrush="{TemplateBinding BorderBrush}"
+						BorderThickness="{TemplateBinding BorderThickness}"
+						RenderTransformOrigin="0.5,0.5">
+						<Grid.RenderTransform>
+							<TranslateTransform X="0" Y="0" />
+						</Grid.RenderTransform>
+
+						<Grid
+							x:Name="PART_IslandsGrid"
+							ColumnSpacing="12"
+							RowSpacing="12" />
+					</Grid>
+				</ControlTemplate>
+			</Setter.Value>
+		</Setter>
+	</Style>
+
+	<Style x:Key="DefaultTrayIconFlyoutIslandStyle" TargetType="local:TrayIconFlyoutIsland">
+		<Setter Property="HorizontalAlignment" Value="Stretch" />
+		<Setter Property="VerticalAlignment" Value="Stretch" />
+		<Setter Property="HorizontalContentAlignment" Value="Stretch" />
+		<Setter Property="HorizontalContentAlignment" Value="Stretch" />
+		<Setter Property="CornerRadius" Value="{StaticResource OverlayCornerRadius}" />
+		<Setter Property="BorderThickness" Value="1" />
+		<Setter Property="BorderBrush" Value="{ThemeResource SurfaceStrokeColorDefaultBrush}" />
+		<Setter Property="AutomationProperties.LandmarkType" Value="Navigation" />
+		<Setter Property="IsTabStop" Value="False" />
+		<Setter Property="Template">
+			<Setter.Value>
+				<ControlTemplate TargetType="local:TrayIconFlyoutIsland">
+					<Grid
+						x:Name="PART_RootGrid"
+						BorderBrush="{TemplateBinding BorderBrush}"
+						BorderThickness="{TemplateBinding BorderThickness}"
+						CornerRadius="{TemplateBinding CornerRadius}"
+						Translation="0,0,32">
+						<Grid.Shadow>
+							<ThemeShadow />
+						</Grid.Shadow>
+
+						<Grid x:Name="PART_BackdropTargetGrid" CornerRadius="{TemplateBinding CornerRadius}" />
+
+						<ContentPresenter x:Name="PART_MainContentPresenter" />
+					</Grid>
+				</ControlTemplate>
+			</Setter.Value>
+		</Setter>
+	</Style>
+
+	<Style x:Key="DefaultWindows11TrayIconMenuFlyoutStyle" TargetType="local:TrayIconMenuFlyout">
+		<Setter Property="HorizontalAlignment" Value="Left" />
+		<Setter Property="VerticalAlignment" Value="Top" />
+		<Setter Property="Margin" Value="12" />
+		<Setter Property="BorderThickness" Value="0" />
+		<Setter Property="BorderBrush" Value="{ThemeResource CardStrokeColorDefaultBrush}" />
+		<Setter Property="AutomationProperties.LandmarkType" Value="Navigation" />
+		<Setter Property="IsTabStop" Value="False" />
+		<Setter Property="Template">
+			<Setter.Value>
+				<ControlTemplate TargetType="local:TrayIconMenuFlyout">
+					<Grid
+						x:Name="PART_RootGrid"
+						BorderBrush="{TemplateBinding BorderBrush}"
+						BorderThickness="{TemplateBinding BorderThickness}">
+
+						<Border
+							x:Name="PART_MenuFlyoutTargetControl"
+							Width="5"
+							Height="5"
+							Background="Blue"
+							RenderTransformOrigin="0.5,0.5">
+							<Border.RenderTransform>
+								<TranslateTransform X="0" Y="40" />
+							</Border.RenderTransform>
+						</Border>
+
+					</Grid>
+				</ControlTemplate>
+			</Setter.Value>
+		</Setter>
+	</Style>
+
+</ResourceDictionary>

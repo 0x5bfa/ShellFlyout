@@ -1,7 +1,7 @@
 # Copyright (c) 0x5BFA. All rights reserved.
 # Licensed under the MIT license.
 
-name: ShellFlyout CI
+name: TrayIconFlyout CI
 
 on:
   push:
@@ -17,12 +17,12 @@ on:
       - 'docs/**'
       - '*.md'
 
-run-name: ${{ github.event_name == 'pull_request' && 'ShellFlyout PR Validation' || 'ShellFlyout CI Validation' }}
+run-name: ${{ github.event_name == 'pull_request' && 'TrayIconFlyout PR Validation' || 'TrayIconFlyout CI Validation' }}
 
 env:
-  WORKING_DIR:           '${{ github.workspace }}' # 'D:\a\ShellFlyout\ShellFlyout'
-  SOLUTION_PATH:         '${{ github.workspace }}\ShellFlyout.slnx'
-  WASDK_APP_CSPROJ_PATH: '${{ github.workspace }}\samples\ShellFlyout.Samples.Wasdk\ShellFlyout.Samples.Wasdk.csproj'
+  WORKING_DIR:           '${{ github.workspace }}' # 'D:\a\TrayIconFlyout\TrayIconFlyout'
+  SOLUTION_PATH:         '${{ github.workspace }}\TrayIconFlyout.slnx'
+  WASDK_APP_CSPROJ_PATH: '${{ github.workspace }}\samples\TrayIconFlyout.Samples.Wasdk\TrayIconFlyout.Samples.Wasdk.csproj'
 
 jobs:
   build:

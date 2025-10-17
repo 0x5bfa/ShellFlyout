@@ -1,0 +1,50 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+
+		<TargetFramework>net9.0-windows10.0.26100.0</TargetFramework>
+		<TargetPlatformMinVersion>10.0.17763.0</TargetPlatformMinVersion>
+		<RuntimeIdentifiers>win-x86;win-x64;win-arm64</RuntimeIdentifiers>
+		<Configurations>Debug;Release</Configurations>
+		<Platforms>x86;x64;arm64</Platforms>
+		<UseWinUI>true</UseWinUI>
+		<Nullable>enable</Nullable>
+		<PublishAot>true</PublishAot>
+		<DisableRuntimeMarshalling>true</DisableRuntimeMarshalling>
+		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+		<LangVersion>preview</LangVersion>
+		<NoWarn>$(NoWarn);CS8305</NoWarn>
+		<DefineConstants>$(DefineConstants);WASDK</DefineConstants>
+
+		<CsWinRTIncludes>Microsoft.UI.Content.ContentExternalBackdropLink;Microsoft.UI.Content.IContentExternalBackdropLink</CsWinRTIncludes>
+
+		<Title>TrayIconFlyout</Title>
+		<Authors>0x5BFA</Authors>
+		<Version>1.0.0</Version>
+		<Description>Empower you app with a shell flyout that pops up from a task tray.</Description>
+		<PackageReadmeFile>..\..\README.md</PackageReadmeFile>
+		<RepositoryUrl>https://github.com/0x5bfa/TrayIconFlyout</RepositoryUrl>
+		<PackageTags>Shell Flyout WinUI WindowsAppSDK WASDK Windows</PackageTags>
+
+	</PropertyGroup>
+
+	<ItemGroup>
+		<CsWinRTInputs Include="Microsoft.UI.winmd" />
+		<None Include="..\..\README.md">
+			<Pack>True</Pack>
+			<PackagePath>\</PackagePath>
+		</None>
+	</ItemGroup>
+
+	<ItemGroup>
+		<PackageReference Include="CommunityToolkit.Labs.WinUI.DependencyPropertyGenerator" Version="0.1.250206-build.2040" />
+		<PackageReference Include="CommunityToolkit.WinUI.Controls.SettingsControls" Version="8.2.250402" />
+		<PackageReference Include="Microsoft.Windows.SDK.BuildTools" Version="10.0.26100.4948" />
+		<PackageReference Include="Microsoft.WindowsAppSDK" Version="1.8.250916003" />
+		<PackageReference Include="Microsoft.Windows.CsWinRT" Version="2.2.0" />
+		<PackageReference Include="Microsoft.Windows.CsWin32" Version="0.3.205" PrivateAssets="all" />
+	</ItemGroup>
+
+	<Import Project="..\TrayIconFlyout.Shared\TrayIconFlyout.Shared.projitems" Label="Shared" />
+
+</Project>
