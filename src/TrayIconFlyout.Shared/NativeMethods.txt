@@ -45,3 +45,4 @@ SetWindowRgn
 GetWindowLongPtr
 SetWindowLongPtr
 GetCursorPos
+Shell_NotifyIconGetRect

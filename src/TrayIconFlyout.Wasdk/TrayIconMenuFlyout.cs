@@ -1,106 +1,98 @@
 ﻿// Copyright (c) 0x5BFA. All rights reserved.
 // Licensed under the MIT license.
 
-using Microsoft.UI.Xaml;
-using Microsoft.UI.Xaml.Controls;
-using Microsoft.UI.Xaml.Controls.Primitives;
-using Microsoft.UI.Xaml.Markup;
 using System;
 using System.Drawing;
-using Windows.Win32;
+
+using Microsoft.UI;
+using Microsoft.UI.Xaml;
+using Microsoft.UI.Xaml.Controls;
+using Microsoft.UI.Xaml.Markup;
+using Microsoft.UI.Xaml.Media;
 
 namespace U5BFA.TrayIconFlyout
 {
-	[ContentProperty(Name = nameof(Items))]
-	public partial class TrayIconMenuFlyout : ItemsControl
-	{
-		private const string PART_RootGrid = "PART_RootGrid";
-		private const string PART_MenuFlyoutTargetControl = "PART_MenuFlyoutTargetControl";
+    [ContentProperty(Name = nameof(Items))]
+    public partial class TrayIconMenuFlyout : ItemsControl
+    {
+        private const string PART_RootGrid = "PART_RootGrid";
+        private const string PART_MenuFlyoutTargetControl = "PART_MenuFlyoutTargetControl";
 
-		private readonly XamlIslandHostWindow? _host;
-		private MenuFlyout? _menuFlyout;
+        private readonly XamlIslandHostWindow? _host;
+        private MenuFlyout? _menuFlyout;
 
-		private Grid? RootGrid;
-		private Border? MenuFlyoutTargetControl;
+        private Grid? RootGrid;
+        private Border? MenuFlyoutTargetControl;
 
-		public bool IsOpen { get; private set; }
+        public bool IsOpen { get; private set; }
 
-		public TrayIconMenuFlyout()
-		{
-			DefaultStyleKey = typeof(TrayIconMenuFlyout);
+        public TrayIconMenuFlyout()
+        {
+            DefaultStyleKey = typeof(TrayIconMenuFlyout);
 
-			_host = new XamlIslandHostWindow();
-			_host.Initialize(this);
-			_host.UpdateWindowVisibility(false);
-			//_host.WindowInactivated += HostWindow_Inactivated;
-		}
+            _host = new XamlIslandHostWindow();
+            _host.Initialize(this);
+            _host.UpdateWindowVisibility(false);
+        }
 
-		protected override void OnApplyTemplate()
-		{
-			base.OnApplyTemplate();
+        protected override void OnApplyTemplate()
+        {
+            base.OnApplyTemplate();
 
-			RootGrid = GetTemplateChild(PART_RootGrid) as Grid
-				?? throw new MissingFieldException($"Could not find {PART_RootGrid} in the given {nameof(TrayIconFlyout)}'s style.");
-			MenuFlyoutTargetControl = GetTemplateChild(PART_MenuFlyoutTargetControl) as Border
-				?? throw new MissingFieldException($"Could not find {PART_MenuFlyoutTargetControl} in the given {nameof(TrayIconFlyout)}'s style.");
-		}
+            RootGrid = GetTemplateChild(PART_RootGrid) as Grid
+                ?? throw new MissingFieldException($"Could not find {PART_RootGrid} in the given {nameof(TrayIconFlyout)}'s style.");
+            MenuFlyoutTargetControl = GetTemplateChild(PART_MenuFlyoutTargetControl) as Border
+                ?? throw new MissingFieldException($"Could not find {PART_MenuFlyoutTargetControl} in the given {nameof(TrayIconFlyout)}'s style.");
 
-		protected override void OnItemsChanged(object e)
-		{
-			base.OnItemsChanged(e);
+            RootGrid.Background = new SolidColorBrush(Colors.Red);
+        }
 
-			_menuFlyout ??= new MenuFlyout();
-			_menuFlyout.Items.Clear();
+        protected override void OnItemsChanged(object e)
+        {
+            base.OnItemsChanged(e);
 
-			foreach (var item in Items)
-				_menuFlyout.Items.Add((MenuFlyoutItemBase)item);
-		}
+            _menuFlyout ??= new MenuFlyout();
+            _menuFlyout.Items.Clear();
 
-		public unsafe void Show()
-		{
-			if (_menuFlyout is null)
-				return;
+            foreach (var item in Items)
+                _menuFlyout.Items.Add((MenuFlyoutItemBase)item);
+        }
 
-			UpdateFlyoutTheme();
+        public unsafe void Show(Point point)
+        {
+            if (_menuFlyout is null)
+                return;
 
-			Point cursorPos;
-			PInvoke.GetCursorPos(&cursorPos);
+            UpdateFlyoutTheme();
 
-			_host?.MoveAndResize(new(cursorPos.X　- 20, cursorPos.Y - 20, 5, 5));
-			_host?.SetHWndRectRegion(new(0, 0, 5, 5));
-			_host?.UpdateWindowVisibility(true);
+            _host?.MoveAndResize(new(point.X, point.Y, 0, 0));
+            _host?.SetHWndRectRegion(new(0, 0, 1, 1));
+            _host?.UpdateWindowVisibility(true);
 
-			//DispatcherQueue.TryEnqueue(() =>
-			//{
-			//	if (_menuFlyout.FindDescendant<MenuFlyoutPresenter>() is { } menuFlyoutPresenter)
-			//	{
-			//	}
-			//});
+            _menuFlyout.ShowAt(MenuFlyoutTargetControl);
 
-			_menuFlyout.ShowAt(MenuFlyoutTargetControl, new FlyoutShowOptions() { Placement = FlyoutPlacementMode.Top });
+            IsOpen = true;
+        }
 
-			IsOpen = true;
-		}
+        public void Hide()
+        {
+            _host?.UpdateWindowVisibility(false);
 
-		public void Hide()
-		{
-			_host?.UpdateWindowVisibility(false);
+            _menuFlyout?.Hide();
 
-			_menuFlyout?.Hide();
+            IsOpen = false;
+        }
 
-			IsOpen = false;
-		}
-
-		private void UpdateFlyoutTheme()
-		{
-			if (GeneralHelpers.IsTaskbarLight())
-			{
-				RequestedTheme = ElementTheme.Light;
-			}
-			else
-			{
-				RequestedTheme = ElementTheme.Dark;
-			}
-		}
-	}
+        private void UpdateFlyoutTheme()
+        {
+            if (GeneralHelpers.IsTaskbarLight())
+            {
+                RequestedTheme = ElementTheme.Light;
+            }
+            else
+            {
+                RequestedTheme = ElementTheme.Dark;
+            }
+        }
+    }
 }

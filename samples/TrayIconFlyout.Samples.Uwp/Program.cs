@@ -30,7 +30,7 @@ namespace U5BFA.TrayIconFlyout
 			host.InitializeHost();
 		}
 
-		private static void Icon_LeftClicked(object? sender, EventArgs e)
+		private static void Icon_LeftClicked(object? sender, MouseEventReceivedEventArgs e)
 		{
 			var host = new XamlIslandWindow()
 			{

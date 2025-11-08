@@ -29,7 +29,7 @@ namespace U5BFA.TrayIconFlyout
 			keyFrames.KeyFrames.Add(new SplineDoubleKeyFrame()
 			{
 				KeySpline = new() { ControlPoint1 = new(0.1, 0.9), ControlPoint2 = new(0.4, 1.0) },
-				KeyTime = KeyTime.FromTimeSpan(TimeSpan.FromMilliseconds(167)),
+				KeyTime = KeyTime.FromTimeSpan(TimeSpan.FromMilliseconds(267)),
 				Value = to,
 			});
 
@@ -55,7 +55,7 @@ namespace U5BFA.TrayIconFlyout
 			keyFrames.KeyFrames.Add(new SplineDoubleKeyFrame()
 			{
 				KeySpline = new() { ControlPoint1 = new(0.2, 0.0), ControlPoint2 = new(0.9, 0.0) },
-				KeyTime = KeyTime.FromTimeSpan(TimeSpan.FromMilliseconds(167)),
+				KeyTime = KeyTime.FromTimeSpan(TimeSpan.FromMilliseconds(200)),
 				Value = to,
 			});
 

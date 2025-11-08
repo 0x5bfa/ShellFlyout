@@ -106,11 +106,13 @@ namespace U5BFA.TrayIconFlyout
 
 			_backdropLink.PlacementVisual.Size = new((float)ActualWidth, (float)ActualHeight);
 			_backdropLink.PlacementVisual.Clip = _backdropLink.PlacementVisual.Compositor.CreateRectangleClip(
-				0, 0, (float)ActualWidth, (float)ActualHeight,
-				new(Convert.ToSingle(BackdropTargetGrid.CornerRadius.TopLeft), Convert.ToSingle(BackdropTargetGrid.CornerRadius.TopLeft)),
-				new(Convert.ToSingle(BackdropTargetGrid.CornerRadius.TopRight), Convert.ToSingle(BackdropTargetGrid.CornerRadius.TopRight)),
-				new(Convert.ToSingle(BackdropTargetGrid.CornerRadius.BottomRight), Convert.ToSingle(BackdropTargetGrid.CornerRadius.BottomRight)),
-				new(Convert.ToSingle(BackdropTargetGrid.CornerRadius.BottomLeft), Convert.ToSingle(BackdropTargetGrid.CornerRadius.BottomLeft)));
+				0, 0, 
+				(float)MainContentPresenter.ActualWidth, 
+				(float)MainContentPresenter.ActualHeight,
+				new(Convert.ToSingle(BackdropTargetGrid.CornerRadius.TopLeft - 1), Convert.ToSingle(BackdropTargetGrid.CornerRadius.TopLeft - 1)),
+				new(Convert.ToSingle(BackdropTargetGrid.CornerRadius.TopRight - 1), Convert.ToSingle(BackdropTargetGrid.CornerRadius.TopRight - 1)),
+				new(Convert.ToSingle(BackdropTargetGrid.CornerRadius.BottomRight - 1), Convert.ToSingle(BackdropTargetGrid.CornerRadius.BottomRight - 1)),
+				new(Convert.ToSingle(BackdropTargetGrid.CornerRadius.BottomLeft - 1), Convert.ToSingle(BackdropTargetGrid.CornerRadius.BottomLeft - 1)));
 
 			ElementCompositionPreview.SetElementChildVisual(BackdropTargetGrid, _backdropLink.PlacementVisual);
 		}

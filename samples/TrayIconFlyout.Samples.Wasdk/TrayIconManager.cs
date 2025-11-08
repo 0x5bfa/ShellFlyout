@@ -21,7 +21,7 @@ namespace U5BFA.TrayIconFlyout
 		{
 			_systemTrayIcon = new SystemTrayIcon()
 			{
-				IconPath = "Assets\\TrayIcon.Dark.ico",
+				IconPath = "Assets\\Tray.ico",
 				Tooltip = "Shell flyout sample app (WASDK)",
 				Id = new Guid("28DE460A-8BD6-4539-A406-5F685584FD4D")
 			};
@@ -34,7 +34,7 @@ namespace U5BFA.TrayIconFlyout
 			_systemTrayIcon.RightClicked += SystemTrayIcon_RightClicked;
 		}
 
-		private void SystemTrayIcon_LeftClicked(object? sender, EventArgs e)
+		private void SystemTrayIcon_LeftClicked(object? sender, MouseEventReceivedEventArgs e)
 		{
 			if (TrayIconFlyout is null)
 				return;
@@ -45,7 +45,7 @@ namespace U5BFA.TrayIconFlyout
 				TrayIconFlyout.Show();
 		}
 
-		private void SystemTrayIcon_RightClicked(object? sender, EventArgs e)
+		private void SystemTrayIcon_RightClicked(object? sender, MouseEventReceivedEventArgs e)
 		{
 			if (_trayIconMenuFlyout is null)
 				return;
@@ -53,7 +53,7 @@ namespace U5BFA.TrayIconFlyout
 			if (_trayIconMenuFlyout.IsOpen)
 				_trayIconMenuFlyout.Hide();
 
-			_trayIconMenuFlyout.Show();
+			_trayIconMenuFlyout.Show(e.Point);
 		}
 
 		public void Dispose()
